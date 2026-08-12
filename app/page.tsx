@@ -1,69 +1,147 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { Activity, Bell, FolderKanban, LayoutDashboard, Settings, Database } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-7xl mx-auto p-8">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            API Control Center
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-gray-600 text-lg">
+            Monitor, manage, and optimize your API services with real-time alerts and insights
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Main Navigation Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <Link href="/dashboard" className="group">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-blue-500">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-500 transition-colors">
+                  <LayoutDashboard className="w-6 h-6 text-blue-600 group-hover:text-white" />
+                </div>
+                <h2 className="text-2xl font-semibold ml-4 group-hover:text-blue-600 transition-colors">Dashboard</h2>
+              </div>
+              <p className="text-gray-600">View all services status, uptime metrics, and quick statistics</p>
+              <div className="mt-4 text-blue-600 font-medium flex items-center">
+                Get Started →
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/services" className="group">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-green-500">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-500 transition-colors">
+                  <Activity className="w-6 h-6 text-green-600 group-hover:text-white" />
+                </div>
+                <h2 className="text-2xl font-semibold ml-4 group-hover:text-green-600 transition-colors">Services</h2>
+              </div>
+              <p className="text-gray-600">Manage your API services, monitor health, and track credits</p>
+              <div className="mt-4 text-green-600 font-medium flex items-center">
+                View Services →
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/alerts" className="group">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-red-500">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-red-100 rounded-lg group-hover:bg-red-500 transition-colors">
+                  <Bell className="w-6 h-6 text-red-600 group-hover:text-white" />
+                </div>
+                <h2 className="text-2xl font-semibold ml-4 group-hover:text-red-600 transition-colors">Alerts</h2>
+              </div>
+              <p className="text-gray-600">Monitor alerts, notifications, and service incidents</p>
+              <div className="mt-4 text-red-600 font-medium flex items-center">
+                View Alerts →
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/projects" className="group">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-purple-500">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-purple-100 rounded-lg group-hover:bg-purple-500 transition-colors">
+                  <FolderKanban className="w-6 h-6 text-purple-600 group-hover:text-white" />
+                </div>
+                <h2 className="text-2xl font-semibold ml-4 group-hover:text-purple-600 transition-colors">Projects</h2>
+              </div>
+              <p className="text-gray-600">Organize services by project and track dependencies</p>
+              <div className="mt-4 text-purple-600 font-medium flex items-center">
+                View Projects →
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/categories" className="group">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-orange-500">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-orange-100 rounded-lg group-hover:bg-orange-500 transition-colors">
+                  <Database className="w-6 h-6 text-orange-600 group-hover:text-white" />
+                </div>
+                <h2 className="text-2xl font-semibold ml-4 group-hover:text-orange-600 transition-colors">Categories</h2>
+              </div>
+              <p className="text-gray-600">Group and organize your services into categories</p>
+              <div className="mt-4 text-orange-600 font-medium flex items-center">
+                Manage Categories →
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/settings" className="group">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-gray-500">
+              <div className="flex items-center mb-4">
+                <div className="p-3 bg-gray-100 rounded-lg group-hover:bg-gray-500 transition-colors">
+                  <Settings className="w-6 h-6 text-gray-600 group-hover:text-white" />
+                </div>
+                <h2 className="text-2xl font-semibold ml-4 group-hover:text-gray-600 transition-colors">Settings</h2>
+              </div>
+              <p className="text-gray-600">Configure notifications, thresholds, and integrations</p>
+              <div className="mt-4 text-gray-600 font-medium flex items-center">
+                Open Settings →
+              </div>
+            </div>
+          </Link>
         </div>
-      </main>
+
+        {/* Quick Info Section */}
+        <div className="bg-white rounded-xl shadow-md p-8 border-l-4 border-blue-500">
+          <h3 className="text-2xl font-semibold mb-4">Getting Started</h3>
+          <div className="space-y-3 text-gray-700">
+            <p>
+              <span className="font-semibold">1.</span> Add your first service in the <Link href="/services" className="text-blue-600 hover:underline">Services</Link> section
+            </p>
+            <p>
+              <span className="font-semibold">2.</span> Configure alert thresholds and monitoring intervals
+            </p>
+            <p>
+              <span className="font-semibold">3.</span> Set up <Link href="/settings" className="text-blue-600 hover:underline">Slack/Telegram notifications</Link> to receive alerts
+            </p>
+            <p>
+              <span className="font-semibold">4.</span> Organize services into <Link href="/projects" className="text-blue-600 hover:underline">projects</Link> for better management
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-12 text-center text-gray-500 text-sm">
+          <p>API Control Center • Monitor your APIs with confidence</p>
+          <p className="mt-2">
+            <a 
+              href="https://github.com/Misto123/api-control-center" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              View on GitHub
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
