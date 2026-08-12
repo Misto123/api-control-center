@@ -1,0 +1,279 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ServiceStatus {
+  ACTIVE
+  DOWN
+  NOT_CONFIGURED
+}
+
+enum AlertType {
+  SERVICE_DOWN
+  SERVICE_RECOVERED
+  LOW_CREDITS
+  CRITICAL_CREDITS
+  DEPLETION_WARNING
+  DEPLETION_CRITICAL
+  HIGH_USAGE
+  SLOW_RESPONSE
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum NotificationChannel {
+  SLACK
+  TELEGRAM
+  EMAIL
+}
+
+enum NotificationStatus {
+  PENDING
+  DELIVERED
+  FAILED
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  icon        String?
+  color       String?
+  services    Service[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model Service {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String?
+  status      ServiceStatus @default(NOT_CONFIGURED)
+  
+  // API Configuration
+  apiUrl          String?
+  apiKey          String? // Encrypted
+  checkEndpoint   String?
+  
+  // Credits tracking
+  totalCredits    Float?
+  usedCredits     Float?
+  creditsPercent  Float?
+  
+  // Alert thresholds (per service override)
+  lowCreditsThreshold         Float?  @default(20)
+  criticalCreditsThreshold    Float?  @default(10)
+  depletionWarningDays        Int?    @default(14)
+  depletionCriticalDays       Int?    @default(7)
+  highUsageThreshold          Float?
+  slowResponseThreshold       Int?    @default(5000) // in ms
+  
+  // Monitoring config
+  monitoringEnabled Boolean  @default(true)
+  checkInterval     Int      @default(60) // seconds
+  lastCheckedAt     DateTime?
+  
+  // Relations
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  
+  metrics         ServiceMetric[]
+  alerts          Alert[]
+  projects        ProjectService[]
+  uptimeRecords   UptimeRecord[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("services")
+}
+
+model ServiceMetric {
+  id              String   @id @default(cuid())
+  serviceId       String
+  service         Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
+  responseTime    Int?     // in milliseconds
+  statusCode      Int?
+  isUp            Boolean
+  errorMessage    String?
+  
+  // Credits at time of check
+  creditsUsed     Float?
+  creditsRemaining Float?
+  
+  timestamp       DateTime @default(now())
+
+  @@index([serviceId, timestamp])
+  @@map("service_metrics")
+}
+
+model UptimeRecord {
+  id          String   @id @default(cuid())
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
+  date        DateTime @db.Date
+  upMinutes   Int      @default(0)
+  downMinutes Int      @default(0)
+  uptimePercent Float  @default(100)
+  
+  incidents   Int      @default(0)
+  longestOutageMinutes Int? @default(0)
+  
+  @@unique([serviceId, date])
+  @@index([serviceId, date])
+  @@map("uptime_records")
+}
+
+model Alert {
+  id          String        @id @default(cuid())
+  serviceId   String
+  service     Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
+  type        AlertType
+  severity    AlertSeverity
+  title       String
+  message     String
+  
+  isRead      Boolean       @default(false)
+  isAcknowledged Boolean    @default(false)
+  isDismissed Boolean       @default(false)
+  
+  // For deduplication
+  isActive    Boolean       @default(true)
+  resolvedAt  DateTime?
+  
+  // Metadata
+  metadata    Json?
+  
+  notifications Notification[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([serviceId, type, isActive])
+  @@index([createdAt])
+  @@map("alerts")
+}
+
+model Notification {
+  id          String             @id @default(cuid())
+  alertId     String
+  alert       Alert              @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  
+  channel     NotificationChannel
+  status      NotificationStatus @default(PENDING)
+  
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  failedAt    DateTime?
+  
+  errorMessage String?
+  retryCount   Int       @default(0)
+  
+  // Channel specific metadata
+  metadata    Json?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([alertId, channel])
+  @@index([status, createdAt])
+  @@map("notifications")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  color       String?
+  icon        String?
+  
+  isArchived  Boolean  @default(false)
+  
+  services    ProjectService[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("projects")
+}
+
+model ProjectService {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
+  notes       String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([projectId, serviceId])
+  @@index([projectId])
+  @@index([serviceId])
+  @@map("project_services")
+}
+
+model NotificationSettings {
+  id          String   @id @default(cuid())
+  
+  // Slack configuration
+  slackEnabled        Boolean @default(false)
+  slackWebhookUrl     String?
+  slackChannel        String?
+  
+  // Telegram configuration
+  telegramEnabled     Boolean @default(false)
+  telegramBotToken    String?
+  telegramChatId      String?
+  
+  // Email configuration
+  emailEnabled        Boolean @default(false)
+  emailRecipients     String?
+  
+  // Alert type toggles for each channel
+  slackAlertTypes     String[] @default([])
+  telegramAlertTypes  String[] @default([])
+  emailAlertTypes     String[] @default([])
+  
+  // Down alert reminder
+  downReminderEnabled Boolean @default(false)
+  downReminderInterval Int?   // in minutes
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("notification_settings")
+}
+
+model GlobalSettings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("global_settings")
+}
