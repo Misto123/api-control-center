@@ -81,6 +81,8 @@ Beautiful landing page with navigation cards to:
 ## 📋 What You Need to Build
 
 The foundation is complete. Here's what remains to create a fully functional application:
+\SUPBASE CARD; https://trello.com/c/K6AFanh5/7323-man-create-supabase-for-api-control-center-task
+
 
 ### Phase 1: Core Pages & API Routes (Essential)
 
