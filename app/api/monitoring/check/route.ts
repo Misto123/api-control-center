@@ -40,6 +40,32 @@ export async function POST() {
       const responseTime = Date.now() - startTime;
       const isUp = res.ok || res.status < 500;
 
+      // Try to parse credits from response
+      let creditsUpdate: { totalCredits?: number; usedCredits?: number; creditsPercent?: number } = {};
+      try {
+        const responseData = await res.json();
+        
+        // the platform API format
+        if (responseData.balance_infos && Array.isArray(responseData.balance_infos)) {
+          const balance = parseFloat(responseData.balance_infos[0]?.total_balance || '0');
+          creditsUpdate = {
+            totalCredits: balance > 0 ? balance : service.totalCredits,
+            usedCredits: 0, // the platform doesn't provide "used" directly
+            creditsPercent: 100, // Assume 100% if we have balance
+          };
+        }
+        // Generic credit response formats
+        else if (responseData.credits !== undefined) {
+          creditsUpdate.totalCredits = responseData.credits;
+          creditsUpdate.creditsPercent = responseData.credits_percent || 100;
+        }
+        else if (responseData.balance !== undefined) {
+          creditsUpdate.totalCredits = responseData.balance;
+        }
+      } catch (e) {
+        // Response not JSON or no credits info - that's fine
+      }
+
       results.push({
         serviceId: service.id,
         name: service.name,
@@ -54,6 +80,7 @@ export async function POST() {
       await supabase.from('services').update({
         status: newStatus,
         lastCheckedAt: new Date().toISOString(),
+        ...creditsUpdate,
       }).eq('id', service.id);
 
       await supabase.from('service_metrics').insert({
