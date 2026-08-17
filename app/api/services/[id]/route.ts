@@ -23,6 +23,9 @@ export async function PUT(
   const { id } = await params;
   const body = await request.json();
 
+  // Convert empty strings to null for foreign keys
+  if (body.categoryId === '') body.categoryId = null;
+
   if (body.totalCredits !== undefined && body.usedCredits !== undefined) {
     body.creditsPercent = Math.round(
       ((body.totalCredits - body.usedCredits) / body.totalCredits) * 100
