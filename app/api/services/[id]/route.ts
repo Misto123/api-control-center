@@ -26,6 +26,17 @@ export async function PUT(
   // Convert empty strings to null for foreign keys
   if (body.categoryId === '') body.categoryId = null;
 
+  // Auto-activate service if API key is set and status is NOT_CONFIGURED
+  const { data: currentService } = await supabase
+    .from('services')
+    .select('status')
+    .eq('id', id)
+    .single();
+
+  if (body.apiKey && currentService?.status === 'NOT_CONFIGURED') {
+    body.status = 'ACTIVE';
+  }
+
   if (body.totalCredits !== undefined && body.usedCredits !== undefined) {
     body.creditsPercent = Math.round(
       ((body.totalCredits - body.usedCredits) / body.totalCredits) * 100

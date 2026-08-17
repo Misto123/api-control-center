@@ -13,6 +13,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'DOWN' | 'NOT_CONFIGURED'>('ALL');
 
   const fetchServices = useCallback(async () => {
     const res = await fetch('/api/services');
@@ -75,6 +76,10 @@ export default function ServicesPage() {
   const downCount = services.filter((s) => s.status === 'DOWN').length;
   const avgUptime = services.length ? 99.9 : 0;
 
+  const filteredServices = statusFilter === 'ALL' 
+    ? services 
+    : services.filter(s => s.status === statusFilter);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto p-8">
@@ -115,16 +120,60 @@ export default function ServicesPage() {
           </div>
         </div>
 
+        {/* Status Filter */}
+        <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setStatusFilter('ALL')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                statusFilter === 'ALL' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All ({services.length})
+            </button>
+            <button
+              onClick={() => setStatusFilter('ACTIVE')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                statusFilter === 'ACTIVE' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Active ({activeCount})
+            </button>
+            <button
+              onClick={() => setStatusFilter('DOWN')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                statusFilter === 'DOWN' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Down ({downCount})
+            </button>
+            <button
+              onClick={() => setStatusFilter('NOT_CONFIGURED')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                statusFilter === 'NOT_CONFIGURED' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Not Configured ({services.filter(s => s.status === 'NOT_CONFIGURED').length})
+            </button>
+          </div>
+        </div>
+
         {loading ? (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
             <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
             <p className="text-gray-600">Loading services...</p>
           </div>
-        ) : services.length > 0 ? (
+        ) : filteredServices.length > 0 ? (
           <div className="space-y-4">
-            {services.map((service) => (
+            {filteredServices.map((service) => (
               <ServiceCard key={service.id} service={service} onEdit={(s) => { setEditingService(s); setShowForm(true); }} onDelete={handleDelete} />
             ))}
+          </div>
+        ) : statusFilter !== 'ALL' ? (
+          <div className="bg-white rounded-xl shadow-md p-12 text-center">
+            <Database className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-xl font-semibold mb-2">No {statusFilter.toLowerCase().replace('_', ' ')} services</h3>
+            <p className="text-gray-600">Try a different filter</p>
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">
