@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { generateId } from '@/lib/utils';
 
 export async function GET() {
   const { data, error } = await supabase
@@ -20,6 +21,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from('projects')
     .insert({
+      id: generateId(),
       name: body.name,
       slug: body.slug,
       description: body.description,

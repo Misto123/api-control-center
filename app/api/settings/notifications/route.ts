@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { generateId } from '@/lib/utils';
 
 export async function GET() {
   const { data, error } = await supabase
@@ -11,7 +12,7 @@ export async function GET() {
   if (error && error.code === 'PGRST116') {
     const { data: created, error: cErr } = await supabase
       .from('notification_settings')
-      .insert({})
+      .insert({ id: generateId() })
       .select()
       .single();
     if (cErr) return NextResponse.json({ error: cErr.message }, { status: 500 });
@@ -43,7 +44,7 @@ export async function PUT(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('notification_settings')
-    .insert(body)
+    .insert({ id: generateId(), ...body })
     .select()
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
