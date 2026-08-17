@@ -21,6 +21,7 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
     apiUrl: service?.apiUrl || '',
     apiKey: service?.apiKey || '',
     checkEndpoint: service?.checkEndpoint || '',
+    creditUnit: service?.creditUnit || 'credits',
     categoryId: service?.categoryId || '',
   });
 
@@ -125,6 +126,23 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                 placeholder="/health or /v1/models"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Credit Unit</label>
+              <select
+                value={form.creditUnit || 'credits'}
+                onChange={(e) => set('creditUnit', e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              >
+                <option value="credits">Credits</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="tokens">Tokens</option>
+                <option value="requests">Requests</option>
+                <option value="GB">GB (Bandwidth)</option>
+                <option value="TB">TB (Bandwidth)</option>
+                <option value="queries">Queries</option>
+              </select>
             </div>
           </div>
 

@@ -10,6 +10,15 @@ interface ServiceCardProps {
   onDelete: (id: string) => Promise<void>;
 }
 
+function formatCredits(amount: number, unit: string | null): string {
+  const unitStr = unit || 'credits';
+  if (unitStr === 'USD') return `$${amount.toFixed(2)}`;
+  if (unitStr === 'EUR') return `€${amount.toFixed(2)}`;
+  if (amount >= 1000000) return `${(amount / 1000000).toFixed(1)}M ${unitStr}`;
+  if (amount >= 1000) return `${(amount / 1000).toFixed(1)}K ${unitStr}`;
+  return `${amount.toFixed(unitStr === 'USD' || unitStr === 'EUR' ? 2 : 0)} ${unitStr}`;
+}
+
 export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -115,7 +124,9 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
                   {service.creditsPercent !== null ? `${service.creditsPercent}%` : 'N/A'}
                 </span>
                 {service.totalCredits !== null && (
-                  <span className="text-gray-500 text-sm">of {service.totalCredits}</span>
+                  <span className="text-gray-500 text-sm">
+                    {formatCredits(service.totalCredits, service.creditUnit)}
+                  </span>
                 )}
               </div>
             </div>
