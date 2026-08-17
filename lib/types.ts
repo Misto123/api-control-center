@@ -28,7 +28,7 @@ export interface Service {
   totalCredits: number | null;
   usedCredits: number | null;
   creditsPercent: number | null;
-  creditUnit: string | null;
+  credit_unit: string | null;
   lowCreditsThreshold: number | null;
   criticalCreditsThreshold: number | null;
   depletionWarningDays: number | null;

@@ -125,7 +125,7 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
                 </span>
                 {service.totalCredits !== null && (
                   <span className="text-gray-500 text-sm">
-                    {formatCredits(service.totalCredits, service.creditUnit)}
+                    {formatCredits(service.totalCredits, service.credit_unit)}
                   </span>
                 )}
               </div>

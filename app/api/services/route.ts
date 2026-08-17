@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       creditsPercent: body.totalCredits && body.usedCredits
         ? Math.round(((body.totalCredits - body.usedCredits) / body.totalCredits) * 100)
         : null,
-      creditUnit: body.creditUnit || 'credits',
+      credit_unit: body.creditUnit || 'credits',
       lowCreditsThreshold: body.lowCreditsThreshold ?? 20,
       criticalCreditsThreshold: body.criticalCreditsThreshold ?? 10,
       depletionWarningDays: body.depletionWarningDays ?? 14,

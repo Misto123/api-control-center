@@ -21,7 +21,7 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
     apiUrl: service?.apiUrl || '',
     apiKey: service?.apiKey || '',
     checkEndpoint: service?.checkEndpoint || '',
-    creditUnit: service?.creditUnit || 'credits',
+    creditUnit: service?.credit_unit || 'credits',
     categoryId: service?.categoryId || '',
   });
 
