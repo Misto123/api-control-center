@@ -132,7 +132,7 @@ export default function Home() {
           <p>API Control Center • Monitor your APIs with confidence</p>
           <p className="mt-2">
             <a 
-              href="https://github.com/Misto123/api-control-center" 
+              href="https://github.com/contactrebel/api-control-center" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"

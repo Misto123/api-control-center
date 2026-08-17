@@ -1,8 +1,6 @@
-// Core types for API Control Center
-
 export type ServiceStatus = 'ACTIVE' | 'DOWN' | 'NOT_CONFIGURED';
 
-export type AlertType = 
+export type AlertType =
   | 'SERVICE_DOWN'
   | 'SERVICE_RECOVERED'
   | 'LOW_CREDITS'
@@ -22,9 +20,36 @@ export interface Service {
   id: string;
   name: string;
   slug: string;
-  description?: string;
+  description: string | null;
   status: ServiceStatus;
+  apiUrl: string | null;
+  apiKey: string | null;
+  checkEndpoint: string | null;
+  totalCredits: number | null;
+  usedCredits: number | null;
+  creditsPercent: number | null;
+  lowCreditsThreshold: number | null;
+  criticalCreditsThreshold: number | null;
+  depletionWarningDays: number | null;
+  depletionCriticalDays: number | null;
+  highUsageThreshold: number | null;
+  slowResponseThreshold: number | null;
+  monitoringEnabled: boolean;
+  checkInterval: number;
+  lastCheckedAt: string | null;
+  categoryId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  category?: Category;
+}
+
+export interface ServiceInput {
+  name: string;
+  slug: string;
+  description?: string;
   apiUrl?: string;
+  apiKey?: string;
+  checkEndpoint?: string;
   totalCredits?: number;
   usedCredits?: number;
   creditsPercent?: number;
@@ -32,56 +57,26 @@ export interface Service {
   criticalCreditsThreshold?: number;
   depletionWarningDays?: number;
   depletionCriticalDays?: number;
-  monitoringEnabled: boolean;
-  lastCheckedAt?: Date;
+  highUsageThreshold?: number;
+  slowResponseThreshold?: number;
+  monitoringEnabled?: boolean;
+  checkInterval?: number;
   categoryId?: string;
-  category?: Category;
-  projects?: ProjectService[];
-  metrics?: ServiceMetric[];
-  alerts?: Alert[];
-  uptimeRecords?: UptimeRecord[];
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface Category {
   id: string;
   name: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-  services?: Service[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ServiceMetric {
-  id: string;
-  serviceId: string;
-  responseTime?: number;
-  statusCode?: number;
-  isUp: boolean;
-  errorMessage?: string;
-  creditsUsed?: number;
-  creditsRemaining?: number;
-  timestamp: Date;
-}
-
-export interface UptimeRecord {
-  id: string;
-  serviceId: string;
-  date: Date;
-  upMinutes: number;
-  downMinutes: number;
-  uptimePercent: number;
-  incidents: number;
-  longestOutageMinutes?: number;
+  description: string | null;
+  icon: string | null;
+  color: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Alert {
   id: string;
   serviceId: string;
-  service?: Service;
   type: AlertType;
   severity: AlertSeverity;
   title: string;
@@ -90,69 +85,11 @@ export interface Alert {
   isAcknowledged: boolean;
   isDismissed: boolean;
   isActive: boolean;
-  resolvedAt?: Date;
-  metadata?: any;
-  notifications?: Notification[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Notification {
-  id: string;
-  alertId: string;
-  channel: NotificationChannel;
-  status: NotificationStatus;
-  sentAt?: Date;
-  deliveredAt?: Date;
-  failedAt?: Date;
-  errorMessage?: string;
-  retryCount: number;
-  metadata?: any;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  color?: string;
-  icon?: string;
-  isArchived: boolean;
-  services?: ProjectService[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ProjectService {
-  id: string;
-  projectId: string;
-  serviceId: string;
-  project?: Project;
+  resolvedAt: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
   service?: Service;
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface NotificationSettings {
-  id: string;
-  slackEnabled: boolean;
-  slackWebhookUrl?: string;
-  slackChannel?: string;
-  telegramEnabled: boolean;
-  telegramBotToken?: string;
-  telegramChatId?: string;
-  emailEnabled: boolean;
-  emailRecipients?: string;
-  slackAlertTypes: string[];
-  telegramAlertTypes: string[];
-  emailAlertTypes: string[];
-  downReminderEnabled: boolean;
-  downReminderInterval?: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface DashboardSummary {
@@ -163,17 +100,5 @@ export interface DashboardSummary {
   totalAlerts: number;
   unreadAlerts: number;
   lowCreditsCount: number;
-  depletingSoonCount: number;
   averageUptime30d: number;
-}
-
-export interface ServiceWithProjects extends Service {
-  projectCount: number;
-  uptime30d?: number;
-  uptime7d?: number;
-  avgResponseTime?: number;
-}
-
-export interface AlertWithService extends Alert {
-  service: Service;
 }

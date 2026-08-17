@@ -11,6 +11,8 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.112.3",
     "axios": "^1.19.0",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.31.0",
@@ -23,6 +25,8 @@
     "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@prisma/config": "^7.9.1",
+    "@prisma/migrate": "^7.9.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -30,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }
