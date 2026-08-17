@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Settings, Send, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Settings, Send, MessageSquare, Activity } from 'lucide-react';
 
 interface NotificationSettings {
   id: string;
@@ -18,35 +18,62 @@ interface NotificationSettings {
   downReminderInterval: number | null;
 }
 
+interface MonitoringSettings {
+  checkInterval: number;
+  depletionWarningDays: number;
+  lowCreditsThreshold: number;
+  criticalCreditsThreshold: number;
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<NotificationSettings | null>(null);
+  const [monitoringSettings, setMonitoringSettings] = useState<MonitoringSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
 
   const fetchSettings = useCallback(async () => {
-    const res = await fetch('/api/settings/notifications');
-    const data = await res.json();
-    setSettings(data);
+    const [notifRes, monitorRes] = await Promise.all([
+      fetch('/api/settings/notifications'),
+      fetch('/api/settings/monitoring'),
+    ]);
+    const [notifData, monitorData] = await Promise.all([
+      notifRes.json(),
+      monitorRes.json(),
+    ]);
+    setSettings(notifData);
+    setMonitoringSettings(monitorData);
     setLoading(false);
   }, []);
 
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const handleSave = async () => {
-    if (!settings) return;
+    if (!settings || !monitoringSettings) return;
     setSaving(true);
-    await fetch('/api/settings/notifications', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settings),
-    });
+    await Promise.all([
+      fetch('/api/settings/notifications', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      }),
+      fetch('/api/settings/monitoring', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(monitoringSettings),
+      }),
+    ]);
     setSaving(false);
   };
 
   const update = (key: string, value: unknown) => {
     if (!settings) return;
     setSettings({ ...settings, [key]: value });
+  };
+
+  const updateMonitoring = (key: string, value: unknown) => {
+    if (!monitoringSettings) return;
+    setMonitoringSettings({ ...monitoringSettings, [key]: value });
   };
 
   if (loading) {
@@ -66,10 +93,66 @@ export default function SettingsPage() {
         <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
           <Settings className="w-8 h-8 text-gray-600" /> Settings
         </h1>
-        <p className="text-gray-600 mb-8">Configure notifications and integrations</p>
+        <p className="text-gray-600 mb-8">Configure notifications and monitoring settings</p>
 
-        {settings && (
+        {settings && monitoringSettings && (
           <div className="space-y-6">
+            {/* Monitoring Settings */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-500" /> Global Monitoring Settings
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Check Interval (seconds)</label>
+                  <input
+                    type="number"
+                    value={monitoringSettings.checkInterval}
+                    onChange={(e) => updateMonitoring('checkInterval', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                    min="60"
+                    step="60"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Default: 3600 (1 hour)</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Depletion Warning (days in advance)</label>
+                  <input
+                    type="number"
+                    value={monitoringSettings.depletionWarningDays}
+                    onChange={(e) => updateMonitoring('depletionWarningDays', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                    min="1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Alert when credits will run out in X days</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Low Credits Threshold (%)</label>
+                    <input
+                      type="number"
+                      value={monitoringSettings.lowCreditsThreshold}
+                      onChange={(e) => updateMonitoring('lowCreditsThreshold', Number(e.target.value))}
+                      className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Critical Credits Threshold (%)</label>
+                    <input
+                      type="number"
+                      value={monitoringSettings.criticalCreditsThreshold}
+                      onChange={(e) => updateMonitoring('criticalCreditsThreshold', Number(e.target.value))}
+                      className="w-full px-4 py-2.5 border rounded-lg text-sm"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Slack */}
             <div className="bg-white rounded-xl shadow-md p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">

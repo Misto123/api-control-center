@@ -21,15 +21,6 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
     apiUrl: service?.apiUrl || '',
     apiKey: service?.apiKey || '',
     checkEndpoint: service?.checkEndpoint || '',
-    totalCredits: service?.totalCredits ?? undefined,
-    usedCredits: service?.usedCredits ?? undefined,
-    lowCreditsThreshold: service?.lowCreditsThreshold ?? 20,
-    criticalCreditsThreshold: service?.criticalCreditsThreshold ?? 10,
-    depletionWarningDays: service?.depletionWarningDays ?? 14,
-    depletionCriticalDays: service?.depletionCriticalDays ?? 7,
-    slowResponseThreshold: service?.slowResponseThreshold ?? 5000,
-    monitoringEnabled: service?.monitoringEnabled ?? true,
-    checkInterval: service?.checkInterval ?? 60,
     categoryId: service?.categoryId || '',
   });
 
@@ -132,103 +123,15 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
                 value={form.checkEndpoint || ''}
                 onChange={(e) => set('checkEndpoint', e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                placeholder="/health"
+                placeholder="/health or /v1/models"
               />
             </div>
           </div>
 
-          {/* Credits */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Credits</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Total Credits</label>
-                <input
-                  type="number"
-                  value={form.totalCredits ?? ''}
-                  onChange={(e) => set('totalCredits', e.target.value ? Number(e.target.value) : null)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Used Credits</label>
-                <input
-                  type="number"
-                  value={form.usedCredits ?? ''}
-                  onChange={(e) => set('usedCredits', e.target.value ? Number(e.target.value) : null)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Alert Thresholds */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Alert Thresholds</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Low Credits %</label>
-                <input
-                  type="number"
-                  value={form.lowCreditsThreshold ?? 20}
-                  onChange={(e) => set('lowCreditsThreshold', Number(e.target.value))}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Critical Credits %</label>
-                <input
-                  type="number"
-                  value={form.criticalCreditsThreshold ?? 10}
-                  onChange={(e) => set('criticalCreditsThreshold', Number(e.target.value))}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Depletion Warning (days)</label>
-                <input
-                  type="number"
-                  value={form.depletionWarningDays ?? 14}
-                  onChange={(e) => set('depletionWarningDays', Number(e.target.value))}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Depletion Critical (days)</label>
-                <input
-                  type="number"
-                  value={form.depletionCriticalDays ?? 7}
-                  onChange={(e) => set('depletionCriticalDays', Number(e.target.value))}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Monitoring */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Monitoring</h3>
-            <div className="flex items-center gap-3">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.monitoringEnabled ?? true}
-                  onChange={(e) => set('monitoringEnabled', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
-              </label>
-              <span className="text-sm text-gray-700">Monitoring Enabled</span>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Check Interval (seconds)</label>
-              <input
-                type="number"
-                value={form.checkInterval ?? 60}
-                onChange={(e) => set('checkInterval', Number(e.target.value))}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-              />
-            </div>
+          {/* Info note */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+            <p className="font-medium mb-1">Note:</p>
+            <p>Credits and monitoring settings are configured globally in Settings. The monitoring system will automatically retrieve credit data from your API.</p>
           </div>
 
           {/* Actions */}
