@@ -31,6 +31,12 @@ export async function POST() {
           method = 'POST';
           body = JSON.stringify({ apikey: service.apiKey });
         }
+        // Firecrawl uses POST with Bearer token and url in body
+        else if (service.name.toLowerCase().includes('firecrawl')) {
+          method = 'POST';
+          headers['Authorization'] = `Bearer ${service.apiKey}`;
+          body = JSON.stringify({ url: 'https://example.com' });
+        }
         // Serper uses POST with X-API-KEY header
         else if (service.name.toLowerCase().includes('serper')) {
           method = 'POST';
@@ -51,15 +57,25 @@ export async function POST() {
       });
 
       const responseTime = Date.now() - startTime;
-      const isUp = res.ok || res.status < 500;
-
+      
       // Try to parse credits from response
       let creditsUpdate: { totalCredits?: number; usedCredits?: number; creditsPercent?: number } = {};
+      let isUp = res.ok || res.status < 500;
+      
       try {
         const responseData = await res.json();
         
+        // Firecrawl: Insufficient credits error means API is UP but credits are 0
+        if (responseData.success === false && responseData.error?.includes('Insufficient credits')) {
+          isUp = true;
+          creditsUpdate = {
+            totalCredits: 0,
+            usedCredits: 0,
+            creditsPercent: 0,
+          };
+        }
         // the platform API format
-        if (responseData.balance_infos && Array.isArray(responseData.balance_infos)) {
+        else if (responseData.balance_infos && Array.isArray(responseData.balance_infos)) {
           const balance = parseFloat(responseData.balance_infos[0]?.total_balance || '0');
           creditsUpdate = {
             totalCredits: balance > 0 ? balance : service.totalCredits,
