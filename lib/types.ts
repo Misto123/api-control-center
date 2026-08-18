@@ -29,6 +29,10 @@ export interface Service {
   usedCredits: number | null;
   creditsPercent: number | null;
   credit_unit: string | null;
+  subscription_plan: string | null;
+  subscription_price: number | null;
+  subscription_credits: number | null;
+  subscription_renewal_date: string | null;
   lowCreditsThreshold: number | null;
   criticalCreditsThreshold: number | null;
   depletionWarningDays: number | null;
@@ -55,6 +59,10 @@ export interface ServiceInput {
   usedCredits?: number;
   creditsPercent?: number;
   creditUnit?: string;
+  subscription_plan?: string;
+  subscription_price?: number;
+  subscription_credits?: number;
+  subscription_renewal_date?: string;
   lowCreditsThreshold?: number;
   criticalCreditsThreshold?: number;
   depletionWarningDays?: number;

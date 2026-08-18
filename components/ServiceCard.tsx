@@ -176,6 +176,33 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
             </div>
           </div>
         </div>
+
+        {/* Subscription Info */}
+        {service.subscription_plan && (
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="text-sm font-semibold text-blue-900 mb-2">💳 Subscription Details</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <div className="text-gray-600 text-xs">Plan</div>
+                <div className="font-medium text-gray-900">{service.subscription_plan}</div>
+              </div>
+              <div>
+                <div className="text-gray-600 text-xs">Price</div>
+                <div className="font-medium text-gray-900">${service.subscription_price}/mo</div>
+              </div>
+              <div>
+                <div className="text-gray-600 text-xs">Monthly Credits</div>
+                <div className="font-medium text-gray-900">{service.subscription_credits?.toLocaleString()}</div>
+              </div>
+              <div>
+                <div className="text-gray-600 text-xs">Renewal Date</div>
+                <div className="font-medium text-gray-900">
+                  {service.subscription_renewal_date ? new Date(service.subscription_renewal_date).toLocaleDateString() : 'N/A'}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -22,6 +22,10 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
     apiKey: service?.apiKey || '',
     checkEndpoint: service?.checkEndpoint || '',
     creditUnit: service?.credit_unit || 'credits',
+    subscription_plan: service?.subscription_plan || '',
+    subscription_price: service?.subscription_price || undefined,
+    subscription_credits: service?.subscription_credits || undefined,
+    subscription_renewal_date: service?.subscription_renewal_date || '',
     categoryId: service?.categoryId || '',
   });
 
@@ -143,6 +147,53 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
                 <option value="TB">TB (Bandwidth)</option>
                 <option value="queries">Queries</option>
               </select>
+            </div>
+          </div>
+
+          {/* Subscription Information */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Subscription Information (Optional)</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Plan Name</label>
+                <input
+                  type="text"
+                  value={form.subscription_plan || ''}
+                  onChange={(e) => set('subscription_plan', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  placeholder="e.g., Hobby Plan, Pro Plan"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Price (USD)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={form.subscription_price || ''}
+                  onChange={(e) => set('subscription_price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  placeholder="22.00"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Credits</label>
+                <input
+                  type="number"
+                  value={form.subscription_credits || ''}
+                  onChange={(e) => set('subscription_credits', e.target.value ? parseInt(e.target.value) : undefined)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  placeholder="5000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Renewal Date</label>
+                <input
+                  type="date"
+                  value={form.subscription_renewal_date || ''}
+                  onChange={(e) => set('subscription_renewal_date', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+              </div>
             </div>
           </div>
 
