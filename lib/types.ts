@@ -112,3 +112,27 @@ export interface DashboardSummary {
   lowCreditsCount: number;
   averageUptime30d: number;
 }
+
+export interface RankTracker {
+  id: string;
+  domain: string;
+  keyword: string;
+  country: string;
+  language: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RankResult {
+  id: string;
+  tracker_id: string;
+  position: number | null;
+  url: string | null;
+  date: string;
+  created_at: string;
+}
+
+export interface RankTrackerWithResults extends RankTracker {
+  results?: RankResult[];
+  latestResult?: RankResult;
+}
