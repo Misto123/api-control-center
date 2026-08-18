@@ -2,13 +2,21 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Bell, CheckCircle, XCircle, Clock, AlertTriangle, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Bell, CheckCircle, XCircle, Clock, AlertTriangle, Settings, LogOut } from 'lucide-react';
 import type { Service, Alert } from '@/lib/types';
 
 export default function DashboardPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  };
 
   const fetchData = useCallback(async () => {
     const [servicesRes, alertsRes] = await Promise.all([
@@ -101,6 +109,9 @@ export default function DashboardPage() {
             <Link href="/settings" className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium flex items-center gap-2">
               <Settings className="w-4 h-4" /> Settings
             </Link>
+            <button onClick={handleLogout} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium flex items-center gap-2">
+              <LogOut className="w-4 h-4" /> Logout
+            </button>
           </div>
         </div>
 

@@ -24,6 +24,11 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
   const [copied, setCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const maskApiKey = (key: string) => {
+    if (key.length <= 4) return '****';
+    return '•'.repeat(key.length - 4) + key.slice(-4);
+  };
+
   const copyKey = async () => {
     if (!service.apiKey) return;
     await navigator.clipboard.writeText(service.apiKey);
@@ -100,7 +105,7 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
           {service.apiKey ? (
             <div className="flex items-center gap-2">
               <code className="text-sm font-mono text-gray-800 flex-1 truncate">
-                {showKey ? service.apiKey : maskedKey}
+                {showKey ? service.apiKey : maskApiKey(service.apiKey)}
               </code>
               <button onClick={() => setShowKey(!showKey)} className="p-1 text-gray-400 hover:text-gray-600 transition-colors" title={showKey ? 'Hide' : 'Show'}>
                 {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
