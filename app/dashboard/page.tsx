@@ -42,6 +42,7 @@ export default function DashboardPage() {
     switch (status) {
       case 'ACTIVE': return <CheckCircle className="w-6 h-6 text-green-500" />;
       case 'DOWN': return <XCircle className="w-6 h-6 text-red-500" />;
+      case 'NOT_CONFIGURED': return <Clock className="w-6 h-6 text-yellow-500" />;
       default: return <Clock className="w-6 h-6 text-gray-400" />;
     }
   };
@@ -50,6 +51,7 @@ export default function DashboardPage() {
     switch (status) {
       case 'ACTIVE': return 'bg-green-50 border-green-200 hover:bg-green-100';
       case 'DOWN': return 'bg-red-50 border-red-200 hover:bg-red-100';
+      case 'NOT_CONFIGURED': return 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100';
       default: return 'bg-gray-50 border-gray-200 hover:bg-gray-100';
     }
   };
@@ -157,7 +159,7 @@ export default function DashboardPage() {
           {services.map((service) => (
             <Link
               key={service.id}
-              href={`/services`}
+              href={`/services?id=${service.id}`}
               className={`relative group border-2 rounded-xl p-4 transition-all ${getStatusColor(service.status)}`}
             >
               {/* Status Icon */}
@@ -196,12 +198,12 @@ export default function DashboardPage() {
               </div>
 
               {/* Hover Details */}
-              <div className="absolute inset-0 bg-white/95 rounded-xl p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border-2 border-blue-500 shadow-lg z-10">
-                <h3 className="font-bold mb-2 text-sm">{service.name}</h3>
+              <div className="absolute inset-0 bg-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border-2 border-blue-500 shadow-lg z-10 overflow-hidden">
+                <h3 className="font-bold mb-1 text-xs truncate">{service.name}</h3>
                 {service.description && (
-                  <p className="text-xs text-gray-600 mb-2">{service.description}</p>
+                  <p className="text-[10px] text-gray-600 mb-2 line-clamp-2">{service.description}</p>
                 )}
-                <div className="space-y-1 text-xs">
+                <div className="space-y-0.5 text-[10px]">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Status:</span>
                     <span className="font-medium">{service.status}</span>
@@ -210,11 +212,11 @@ export default function DashboardPage() {
                     <>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Total:</span>
-                        <span className="font-medium">{formatCredits(service.totalCredits, service.credit_unit)} {service.credit_unit}</span>
+                        <span className="font-medium truncate">{formatCredits(service.totalCredits, service.credit_unit)} {service.credit_unit}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Used:</span>
-                        <span className="font-medium">{formatCredits(service.usedCredits, service.credit_unit)} {service.credit_unit}</span>
+                        <span className="font-medium truncate">{formatCredits(service.usedCredits, service.credit_unit)} {service.credit_unit}</span>
                       </div>
                     </>
                   )}
@@ -225,8 +227,8 @@ export default function DashboardPage() {
                     </div>
                   )}
                   {service.apiUrl && (
-                    <div className="mt-2 pt-2 border-t">
-                      <span className="text-gray-500 break-all">{service.apiUrl}</span>
+                    <div className="mt-1 pt-1 border-t">
+                      <span className="text-gray-500 break-all line-clamp-2">{service.apiUrl}</span>
                     </div>
                   )}
                 </div>

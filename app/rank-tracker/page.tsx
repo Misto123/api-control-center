@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, RefreshCw, TrendingUp, TrendingDown, Minus, Calendar, ExternalLink, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, RefreshCw, TrendingUp, TrendingDown, Minus, Calendar, ExternalLink, Trash2, Clock } from 'lucide-react';
 import type { RankTrackerWithResults } from '@/lib/types';
 
 export default function RankTrackersPage() {
@@ -26,10 +26,12 @@ export default function RankTrackersPage() {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Clean domain - remove protocol and trailing slash
+    const cleanDomain = form.domain.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/$/, '');
     await fetch('/api/rank-trackers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, domain: cleanDomain }),
     });
     setForm({ domain: '', keyword: '', country: 'us', language: 'en' });
     setShowForm(false);
@@ -175,20 +177,32 @@ export default function RankTrackersPage() {
                             #{latestPos}
                           </span>
                         )}
-                        {!latestPos && (
-                          <span className="text-gray-400 text-sm">Not ranked in top 100</span>
+                        {!latestPos && tracker.latestResult && (
+                          <span className="text-gray-400 text-sm">Not in top 100</span>
+                        )}
+                        {!tracker.latestResult && (
+                          <span className="text-yellow-600 text-sm flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            Never checked
+                          </span>
                         )}
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
                         <span className="font-mono bg-gray-100 px-2 py-1 rounded">"{tracker.keyword}"</span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {tracker.latestResult?.date
-                            ? new Date(tracker.latestResult.date).toLocaleDateString()
-                            : 'Never checked'}
-                        </span>
-                        <span className="uppercase text-xs">{tracker.country}</span>
+                        <span className="uppercase text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{tracker.country}</span>
                       </div>
+                      {tracker.latestResult && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-medium">
+                            Last checked: {new Date(tracker.latestResult.date).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric', 
+                              year: 'numeric' 
+                            })}
+                          </span>
+                        </div>
+                      )}
                       {tracker.latestResult?.url && (
                         <a
                           href={tracker.latestResult.url}

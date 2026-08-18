@@ -1,13 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Activity, Database } from 'lucide-react';
 import type { Service, ServiceInput, Category } from '@/lib/types';
 import { ServiceCard } from '@/components/ServiceCard';
 import { ServiceForm } from '@/components/ServiceForm';
 
-export default function ServicesPage() {
+function ServicesContent() {
+  const searchParams = useSearchParams();
+  const serviceId = searchParams.get('id');
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +35,17 @@ export default function ServicesPage() {
     fetchServices();
     fetchCategories();
   }, [fetchServices, fetchCategories]);
+
+  // Auto-open service details if ID is in query string
+  useEffect(() => {
+    if (serviceId && services.length > 0) {
+      const service = services.find(s => s.id === serviceId);
+      if (service) {
+        setEditingService(service);
+        setShowForm(true);
+      }
+    }
+  }, [serviceId, services]);
 
   const handleSave = async (data: ServiceInput) => {
     if (editingService) {
@@ -199,5 +213,13 @@ export default function ServicesPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function ServicesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">Loading...</div>}>
+      <ServicesContent />
+    </Suspense>
   );
 }

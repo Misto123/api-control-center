@@ -20,6 +20,9 @@ async function getSerperApiKey() {
 }
 
 async function checkRanking(keyword: string, domain: string, country: string, apiKey: string) {
+  // Clean the keyword - remove quotes if present
+  const cleanKeyword = keyword.replace(/^["']|["']$/g, '');
+  
   const response = await fetch('https://google.serper.dev/search', {
     method: 'POST',
     headers: {
@@ -27,7 +30,7 @@ async function checkRanking(keyword: string, domain: string, country: string, ap
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      q: keyword,
+      q: cleanKeyword,
       gl: country,
       num: 100, // Check top 100 results
     }),
@@ -40,19 +43,28 @@ async function checkRanking(keyword: string, domain: string, country: string, ap
   const data = await response.json();
   const results = data.organic || [];
 
+  // Clean the domain - remove protocol and www
+  const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/$/, '');
+
   // Find the domain in the results
   let position = null;
   let url = null;
 
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
-    const resultDomain = new URL(result.link).hostname.replace('www.', '');
-    const searchDomain = domain.replace('www.', '');
-
-    if (resultDomain === searchDomain) {
-      position = i + 1;
-      url = result.link;
-      break;
+    try {
+      const resultUrl = new URL(result.link);
+      const resultDomain = resultUrl.hostname.replace(/^www\./, '');
+      
+      // Check if result domain matches or is a subdomain/path of the target domain
+      if (resultDomain === cleanDomain || resultDomain.endsWith('.' + cleanDomain)) {
+        position = i + 1;
+        url = result.link;
+        break;
+      }
+    } catch (e) {
+      // Skip invalid URLs
+      continue;
     }
   }
 
