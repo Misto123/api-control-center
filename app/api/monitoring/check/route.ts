@@ -21,19 +21,32 @@ export async function POST() {
 
     const startTime = Date.now();
     try {
-      const headers: Record<string, string> = {};
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      let method = 'GET';
+      let body: string | undefined;
+
       if (service.apiKey) {
-        if (service.name.toLowerCase().includes('serper')) {
+        // RalfyIndex uses POST with apikey in body
+        if (service.name.toLowerCase().includes('ralfyindex')) {
+          method = 'POST';
+          body = JSON.stringify({ apikey: service.apiKey });
+        }
+        // Serper uses POST with X-API-KEY header
+        else if (service.name.toLowerCase().includes('serper')) {
+          method = 'POST';
           headers['X-API-KEY'] = service.apiKey;
-        } else {
+          body = JSON.stringify({ q: 'health check', num: 1 });
+        }
+        // Default: Bearer token
+        else {
           headers['Authorization'] = `Bearer ${service.apiKey}`;
         }
       }
 
       const res = await fetch(url, {
-        method: service.name.toLowerCase().includes('serper') ? 'POST' : 'GET',
-        headers: { 'Content-Type': 'application/json', ...headers },
-        body: service.name.toLowerCase().includes('serper') ? JSON.stringify({ q: 'health check', num: 1 }) : undefined,
+        method,
+        headers,
+        body,
         signal: AbortSignal.timeout(service.slowResponseThreshold ?? 5000),
       });
 
@@ -53,6 +66,11 @@ export async function POST() {
             usedCredits: 0, // the platform doesn't provide "used" directly
             creditsPercent: 100, // Assume 100% if we have balance
           };
+        }
+        // RalfyIndex API format: {"status":"ok","balance":9994}
+        else if (responseData.status === 'ok' && responseData.balance !== undefined) {
+          creditsUpdate.totalCredits = responseData.balance;
+          creditsUpdate.creditsPercent = 100; // We don't know the original total, assume what we have is 100%
         }
         // Generic credit response formats
         else if (responseData.credits !== undefined) {
