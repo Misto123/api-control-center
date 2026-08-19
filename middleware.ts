@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const PASSWORD = 'rereeu';
-const PUBLIC_PATHS = ['/api/monitoring/check', '/api/auth/login', '/api/auth/logout']; // Allow monitoring checks and auth without auth
+const PUBLIC_PATHS = ['/api/monitoring/check', '/api/auth/login', '/api/auth/logout', '/api/payment-monitor']; // Allow monitoring checks and auth without auth
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

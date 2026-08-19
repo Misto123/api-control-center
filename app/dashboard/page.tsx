@@ -3,19 +3,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Bell, CheckCircle, XCircle, Clock, AlertTriangle, Settings, LogOut, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Bell, CheckCircle, XCircle, Clock, AlertTriangle, Settings, LogOut, TrendingUp, CreditCard } from 'lucide-react';
 import type { Service, Alert } from '@/lib/types';
 
 export default function DashboardPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkingPayments, setCheckingPayments] = useState(false);
   const router = useRouter();
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/login');
     router.refresh();
+  };
+
+  const handleCheckPayments = async () => {
+    setCheckingPayments(true);
+    try {
+      await fetch('/api/payment-monitor', { method: 'POST' });
+      // Refresh alerts to show any new payment notifications
+      fetchData();
+    } finally {
+      setCheckingPayments(false);
+    }
   };
 
   const fetchData = useCallback(async () => {
@@ -142,6 +154,15 @@ export default function DashboardPage() {
             <span className="text-gray-600">Not Configured:</span>
             <span className="font-semibold text-gray-600">{notConfiguredCount}</span>
           </div>
+          <div className="w-px h-6 bg-gray-200" />
+          <button
+            onClick={handleCheckPayments}
+            disabled={checkingPayments}
+            className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-xs font-medium disabled:opacity-50"
+          >
+            <CreditCard className={`w-4 h-4 ${checkingPayments ? 'animate-spin' : ''}`} />
+            {checkingPayments ? 'Checking...' : 'Check Payments'}
+          </button>
           {unreadAlerts > 0 && (
             <>
               <div className="w-px h-6 bg-gray-200" />
