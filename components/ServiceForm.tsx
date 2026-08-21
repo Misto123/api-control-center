@@ -21,11 +21,12 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
     apiUrl: service?.apiUrl || '',
     apiKey: service?.apiKey || '',
     checkEndpoint: service?.checkEndpoint || '',
-    creditUnit: service?.credit_unit || 'credits',
+    credit_unit: service?.credit_unit || 'credits',
     subscription_plan: service?.subscription_plan || '',
     subscription_price: service?.subscription_price || undefined,
     subscription_credits: service?.subscription_credits || undefined,
     subscription_renewal_date: service?.subscription_renewal_date || '',
+    minimum_balance: service?.minimum_balance ?? 5,
     categoryId: service?.categoryId || '',
   });
 
@@ -134,8 +135,8 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Credit Unit</label>
               <select
-                value={form.creditUnit || 'credits'}
-                onChange={(e) => set('creditUnit', e.target.value)}
+                value={form.credit_unit || 'credits'}
+                onChange={(e) => set('credit_unit', e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               >
                 <option value="credits">Credits</option>
@@ -147,6 +148,18 @@ export function ServiceForm({ service, categories, onSave, onCancel }: ServiceFo
                 <option value="TB">TB (Bandwidth)</option>
                 <option value="queries">Queries</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Balance Alert</label>
+              <input
+                type="number"
+                step="0.01"
+                value={form.minimum_balance ?? 5}
+                onChange={(e) => set('minimum_balance', e.target.value ? parseFloat(e.target.value) : 5)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                placeholder="5.00"
+              />
+              <p className="text-xs text-gray-500 mt-1">Alert when balance drops below this amount (USD/EUR)</p>
             </div>
           </div>
 

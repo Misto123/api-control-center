@@ -33,6 +33,7 @@ export interface Service {
   subscription_price: number | null;
   subscription_credits: number | null;
   subscription_renewal_date: string | null;
+  minimum_balance: number | null;
   lowCreditsThreshold: number | null;
   criticalCreditsThreshold: number | null;
   depletionWarningDays: number | null;
@@ -50,19 +51,20 @@ export interface Service {
 
 export interface ServiceInput {
   name: string;
-  slug: string;
+  slug?: string;
   description?: string;
+  status?: ServiceStatus;
   apiUrl?: string;
   apiKey?: string;
   checkEndpoint?: string;
-  totalCredits?: number;
-  usedCredits?: number;
-  creditsPercent?: number;
-  creditUnit?: string;
+  totalCredits?: number | null;
+  usedCredits?: number | null;
+  credit_unit?: string;
   subscription_plan?: string;
   subscription_price?: number;
   subscription_credits?: number;
   subscription_renewal_date?: string;
+  minimum_balance?: number;
   lowCreditsThreshold?: number;
   criticalCreditsThreshold?: number;
   depletionWarningDays?: number;

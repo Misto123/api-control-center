@@ -68,7 +68,20 @@ export default function DashboardPage() {
     }
   };
 
-  const getCreditColor = (percent: number | null) => {
+  const getCreditColor = (service: Service) => {
+    const percent = service.creditsPercent;
+    const creditUnit = service.credit_unit;
+    const totalCredits = service.totalCredits;
+    const minimumBalance = service.minimum_balance ?? 5;
+
+    // For USD/EUR, check against minimum_balance (default 5)
+    if ((creditUnit === 'USD' || creditUnit === 'EUR') && totalCredits !== null) {
+      if (totalCredits < minimumBalance) return 'text-red-600';
+      if (totalCredits < minimumBalance * 2) return 'text-orange-600';
+      return 'text-green-600';
+    }
+
+    // For other units, use percentage
     if (percent === null) return 'text-gray-500';
     if (percent < 10) return 'text-red-600';
     if (percent < 20) return 'text-orange-600';
@@ -197,7 +210,7 @@ export default function DashboardPage() {
               <div className="space-y-1">
                 {service.creditsPercent !== null ? (
                   <>
-                    <div className={`text-2xl font-bold ${getCreditColor(service.creditsPercent)}`}>
+                    <div className={`text-2xl font-bold ${getCreditColor(service)}`}>
                       {service.creditsPercent}%
                     </div>
                     <div className="text-xs text-gray-600">

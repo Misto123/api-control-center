@@ -117,6 +117,37 @@ export async function POST() {
         ...creditsUpdate,
       }).eq('id', service.id);
 
+      // Check for low balance (USD/EUR services)
+      if (creditsUpdate.totalCredits !== undefined) {
+        const creditUnit = service.credit_unit || 'credits';
+        const minimumBalance = service.minimum_balance ?? 5;
+        const currentBalance = creditsUpdate.totalCredits;
+
+        // For USD/EUR services, check against minimum_balance
+        if ((creditUnit === 'USD' || creditUnit === 'EUR') && currentBalance < minimumBalance) {
+          const { data: existingAlert } = await supabase
+            .from('alerts')
+            .select('id')
+            .eq('serviceId', service.id)
+            .eq('type', 'LOW_CREDITS')
+            .eq('isActive', true)
+            .single();
+
+          if (!existingAlert) {
+            await supabase.from('alerts').insert({
+              id: `a${Date.now()}${Math.random().toString(36).substring(2, 8)}`,
+              serviceId: service.id,
+              type: 'LOW_CREDITS',
+              severity: 'WARNING',
+              title: `${service.name} - Low Balance`,
+              message: `Balance is ${creditUnit === 'USD' ? '$' : '€'}${currentBalance.toFixed(2)}, below minimum threshold of ${creditUnit === 'USD' ? '$' : '€'}${minimumBalance.toFixed(2)}`,
+              isActive: true,
+              isRead: false,
+            });
+          }
+        }
+      }
+
       await supabase.from('service_metrics').insert({
         id: `m${Date.now()}${Math.random().toString(36).substring(2, 8)}`,
         serviceId: service.id,
