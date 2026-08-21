@@ -23,52 +23,57 @@ async function checkRanking(keyword: string, domain: string, country: string, ap
   // Clean the keyword - remove quotes if present
   const cleanKeyword = keyword.replace(/^["']|["']$/g, '');
   
-  const response = await fetch('https://google.serper.dev/search', {
-    method: 'POST',
-    headers: {
-      'X-API-KEY': apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      q: cleanKeyword,
-      gl: country,
-      num: 100, // Check top 100 results
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Serper API error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const results = data.organic || [];
-
   // Clean the domain - remove protocol and www
   const cleanDomain = domain.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/$/, '');
 
-  // Find the domain in the results
-  let position = null;
-  let url = null;
+  // Check up to 10 pages (100 results total)
+  for (let page = 1; page <= 10; page++) {
+    const response = await fetch('https://google.serper.dev/search', {
+      method: 'POST',
+      headers: {
+        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        q: cleanKeyword,
+        gl: country,
+        num: 10,
+        page: page,
+      }),
+    });
 
-  for (let i = 0; i < results.length; i++) {
-    const result = results[i];
-    try {
-      const resultUrl = new URL(result.link);
-      const resultDomain = resultUrl.hostname.replace(/^www\./, '');
-      
-      // Check if result domain matches or is a subdomain/path of the target domain
-      if (resultDomain === cleanDomain || resultDomain.endsWith('.' + cleanDomain)) {
-        position = i + 1;
-        url = result.link;
-        break;
+    if (!response.ok) {
+      throw new Error(`Serper API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const results = data.organic || [];
+
+    if (results.length === 0) {
+      // No more results available
+      break;
+    }
+
+    // Check each result
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      try {
+        const resultUrl = new URL(result.link);
+        const resultDomain = resultUrl.hostname.replace(/^www\./, '');
+        
+        // Check if result domain matches or is a subdomain/path of the target domain
+        if (resultDomain === cleanDomain || resultDomain.endsWith('.' + cleanDomain)) {
+          const position = (page - 1) * 10 + (i + 1);
+          return { position, url: result.link };
+        }
+      } catch (e) {
+        // Skip invalid URLs
+        continue;
       }
-    } catch (e) {
-      // Skip invalid URLs
-      continue;
     }
   }
 
-  return { position, url };
+  return { position: null, url: null };
 }
 
 export async function POST(request: Request) {
