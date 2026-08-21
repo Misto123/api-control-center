@@ -25,31 +25,41 @@ interface MonitoringSettings {
   criticalCreditsThreshold: number;
 }
 
+interface AppSettings {
+  id: string;
+  seo_flow_api_key: string | null;
+  gctr_api_key: string | null;
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<NotificationSettings | null>(null);
   const [monitoringSettings, setMonitoringSettings] = useState<MonitoringSettings | null>(null);
+  const [appSettings, setAppSettings] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
 
   const fetchSettings = useCallback(async () => {
-    const [notifRes, monitorRes] = await Promise.all([
+    const [notifRes, monitorRes, appRes] = await Promise.all([
       fetch('/api/settings/notifications'),
       fetch('/api/settings/monitoring'),
+      fetch('/api/app-settings'),
     ]);
-    const [notifData, monitorData] = await Promise.all([
+    const [notifData, monitorData, appData] = await Promise.all([
       notifRes.json(),
       monitorRes.json(),
+      appRes.json(),
     ]);
     setSettings(notifData);
     setMonitoringSettings(monitorData);
+    setAppSettings(appData);
     setLoading(false);
   }, []);
 
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const handleSave = async () => {
-    if (!settings || !monitoringSettings) return;
+    if (!settings || !monitoringSettings || !appSettings) return;
     setSaving(true);
     await Promise.all([
       fetch('/api/settings/notifications', {
@@ -61,6 +71,11 @@ export default function SettingsPage() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(monitoringSettings),
+      }),
+      fetch('/api/app-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(appSettings),
       }),
     ]);
     setSaving(false);
@@ -74,6 +89,11 @@ export default function SettingsPage() {
   const updateMonitoring = (key: string, value: unknown) => {
     if (!monitoringSettings) return;
     setMonitoringSettings({ ...monitoringSettings, [key]: value });
+  };
+
+  const updateApp = (key: string, value: unknown) => {
+    if (!appSettings) return;
+    setAppSettings({ ...appSettings, [key]: value });
   };
 
   if (loading) {
@@ -95,8 +115,40 @@ export default function SettingsPage() {
         </h1>
         <p className="text-gray-600 mb-8">Configure notifications and monitoring settings</p>
 
-        {settings && monitoringSettings && (
+        {settings && monitoringSettings && appSettings && (
           <div className="space-y-6">
+            {/* SEO Tools Settings */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Settings className="w-5 h-5 text-purple-500" /> SEO Tools API Keys
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">Universal API keys used across all websites</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SEO Flow API Key</label>
+                  <input
+                    type="text"
+                    value={appSettings.seo_flow_api_key || ''}
+                    onChange={(e) => updateApp('seo_flow_api_key', e.target.value)}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm font-mono"
+                    placeholder="Enter SEO Flow API key"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Used for all websites marked as "Added to SEO Flow"</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">G CTR Tool API Key</label>
+                  <input
+                    type="text"
+                    value={appSettings.gctr_api_key || ''}
+                    onChange={(e) => updateApp('gctr_api_key', e.target.value)}
+                    className="w-full px-4 py-2.5 border rounded-lg text-sm font-mono"
+                    placeholder="Enter G CTR API key"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Used for all websites marked as "Added to G CTR Tool"</p>
+                </div>
+              </div>
+            </div>
+
             {/* Monitoring Settings */}
             <div className="bg-white rounded-xl shadow-md p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">

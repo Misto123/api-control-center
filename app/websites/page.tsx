@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Edit2, Trash2, ExternalLink, CheckCircle, XCircle, DollarSign, Target } from 'lucide-react';
 import type { Website, WebsiteInput } from '@/lib/types';
+import { Navigation } from '@/components/Navigation';
 
 export default function WebsitesPage() {
   const [websites, setWebsites] = useState<Website[]>([]);
@@ -69,12 +70,15 @@ export default function WebsitesPage() {
                 <p className="text-sm text-gray-600 mt-1">Manage websites for ranking optimization</p>
               </div>
             </div>
-            <button
-              onClick={() => { setEditingWebsite(null); setShowForm(true); }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
-            >
-              <Plus className="w-4 h-4" /> Add Website
-            </button>
+            <div className="flex gap-3 items-center">
+              <Navigation />
+              <button
+                onClick={() => { setEditingWebsite(null); setShowForm(true); }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+              >
+                <Plus className="w-4 h-4" /> Add Website
+              </button>
+            </div>
           </div>
 
           {/* Filters */}
@@ -276,9 +280,7 @@ function WebsiteForm({ website, onSave, onCancel }: {
     description: website?.description || '',
     niche: website?.niche || '',
     added_to_seo_flow: website?.added_to_seo_flow || false,
-    seo_flow_api_key: website?.seo_flow_api_key || '',
     added_to_gctr: website?.added_to_gctr || false,
-    gctr_api_key: website?.gctr_api_key || '',
     target_keywords: website?.target_keywords || [],
     monthly_budget: website?.monthly_budget || undefined,
     priority: website?.priority || 'medium',
@@ -397,18 +399,7 @@ function WebsiteForm({ website, onSave, onCancel }: {
                   Added to SEO Flow API
                 </label>
               </div>
-              {form.added_to_seo_flow && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SEO Flow API Key</label>
-                  <input
-                    type="text"
-                    value={form.seo_flow_api_key || ''}
-                    onChange={(e) => set('seo_flow_api_key', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-                    placeholder="API key (if applicable)"
-                  />
-                </div>
-              )}
+              <p className="text-xs text-gray-500">Configure universal API key in Settings</p>
             </div>
 
             {/* G CTR Tool Integration */}
@@ -425,18 +416,7 @@ function WebsiteForm({ website, onSave, onCancel }: {
                   Added to G CTR Tool
                 </label>
               </div>
-              {form.added_to_gctr && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">G CTR API Key</label>
-                  <input
-                    type="text"
-                    value={form.gctr_api_key || ''}
-                    onChange={(e) => set('gctr_api_key', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-                    placeholder="API key (if applicable)"
-                  />
-                </div>
-              )}
+              <p className="text-xs text-gray-500">Configure universal API key in Settings</p>
             </div>
 
             {/* Target Keywords */}

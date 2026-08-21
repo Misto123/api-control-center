@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Plus, RefreshCw, TrendingUp, TrendingDown, Minus, Calendar, ExternalLink, Trash2, Clock } from 'lucide-react';
 import type { RankTrackerWithResults } from '@/lib/types';
+import { Navigation } from '@/components/Navigation';
 
 export default function RankTrackersPage() {
   const [trackers, setTrackers] = useState<RankTrackerWithResults[]>([]);
@@ -81,16 +82,19 @@ export default function RankTrackersPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Link href="/dashboard" className="p-2 hover:bg-white rounded-lg transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Rank Tracker
-              </h1>
-              <p className="text-gray-600 mt-1">Monitor your domain rankings on Google (checked every 3 days)</p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard" className="p-2 hover:bg-white rounded-lg transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Rank Tracker
+                </h1>
+                <p className="text-gray-600 mt-1">Monitor your domain rankings on Google (checked every 3 days)</p>
+              </div>
             </div>
+            <Navigation />
           </div>
 
           <div className="flex gap-3">
@@ -188,7 +192,7 @@ export default function RankTrackersPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                        <span className="font-mono bg-gray-100 px-2 py-1 rounded">"{tracker.keyword}"</span>
+                        <span className="font-mono bg-gray-100 px-2 py-1 rounded">{tracker.keyword}</span>
                         <span className="uppercase text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{tracker.country}</span>
                       </div>
                       {tracker.latestResult && (
