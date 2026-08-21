@@ -138,3 +138,36 @@ export interface RankTrackerWithResults extends RankTracker {
   results?: RankResult[];
   latestResult?: RankResult;
 }
+
+export interface Website {
+  id: string;
+  name: string;
+  url: string;
+  description: string | null;
+  niche: string | null;
+  added_to_seo_flow: boolean;
+  seo_flow_api_key: string | null;
+  added_to_gctr: boolean;
+  gctr_api_key: string | null;
+  target_keywords: string[];
+  monthly_budget: number | null;
+  priority: 'low' | 'medium' | 'high';
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WebsiteInput {
+  name: string;
+  url: string;
+  description?: string;
+  niche?: string;
+  added_to_seo_flow?: boolean;
+  seo_flow_api_key?: string;
+  added_to_gctr?: boolean;
+  gctr_api_key?: string;
+  target_keywords?: string[];
+  monthly_budget?: number;
+  priority?: 'low' | 'medium' | 'high';
+  notes?: string;
+}

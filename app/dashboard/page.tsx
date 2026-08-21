@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Bell, CheckCircle, XCircle, Clock, AlertTriangle, Settings, LogOut, TrendingUp, CreditCard } from 'lucide-react';
+import { ArrowLeft, Bell, CheckCircle, XCircle, Clock, AlertTriangle, Settings, LogOut, TrendingUp, CreditCard, Globe } from 'lucide-react';
 import type { Service, Alert } from '@/lib/types';
 
 export default function DashboardPage() {
@@ -124,6 +124,9 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold">API Control Center</h1>
           </div>
           <div className="flex gap-3">
+            <Link href="/websites" className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium flex items-center gap-2">
+              <Globe className="w-4 h-4" /> SEO Websites
+            </Link>
             <Link href="/rank-tracker" className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium flex items-center gap-2">
               <TrendingUp className="w-4 h-4" /> Rank Tracker
             </Link>
