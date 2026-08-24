@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle, XCircle, Clock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import type { Service, Alert } from '@/lib/types';
-import { Navigation } from '@/components/Navigation';
 
 export default function DashboardPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -134,11 +133,6 @@ export default function DashboardPage() {
             </Link>
             <h1 className="text-3xl font-bold">API Control Center</h1>
           </div>
-          <Navigation 
-            unreadAlerts={unreadAlerts} 
-            onCheckPayments={handleCheckPayments}
-            checkingPayments={checkingPayments}
-          />
         </div>
 
         {/* Summary Bar */}
@@ -189,11 +183,11 @@ export default function DashboardPage() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 gap-2">
           {filteredServices.map((service) => (
             <div
               key={service.id}
-              className={`relative group border-2 rounded-xl p-4 transition-all ${getStatusColor(service.status)}`}
+              className={`relative group min-h-20 border-2 rounded-xl p-3 transition-all ${getStatusColor(service.status)}`}
             >
               <Link href={`/services?id=${service.id}`} className="block">
               {/* Status Icon */}
@@ -202,7 +196,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Service Name */}
-              <h3 className="text-sm font-bold mb-2 pr-8 line-clamp-2" title={service.name}>
+              <h3 className="text-sm font-bold mb-1 pr-8 truncate" title={service.name}>
                 {service.name}
               </h3>
 

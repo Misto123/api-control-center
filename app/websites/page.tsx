@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Edit2, Trash2, ExternalLink, CheckCircle, XCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import type { Website, WebsiteInput } from '@/lib/types';
-import { Navigation } from '@/components/Navigation';
 
 type SortField = 'name' | 'created_at' | 'priority' | 'niche';
 type SortDirection = 'asc' | 'desc';
@@ -134,7 +133,6 @@ export default function WebsitesPage() {
               </div>
             </div>
             <div className="flex gap-3 items-center">
-              <Navigation />
               <button
                 onClick={() => { setEditingWebsite(null); setShowForm(true); }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"

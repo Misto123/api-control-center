@@ -18,18 +18,17 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Get latest result for each tracker
+  // Return the latest seven checks so the UI can show ranking history.
   const trackersWithResults = await Promise.all(
     (trackers || []).map(async (tracker) => {
-      const { data: latestResult } = await supabase
+      const { data: results } = await supabase
         .from('rank_results')
         .select('*')
         .eq('tracker_id', tracker.id)
-        .order('date', { ascending: false })
-        .limit(1)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(7);
 
-      return { ...tracker, latestResult };
+      return { ...tracker, results: results || [], latestResult: results?.[0] || null };
     })
   );
 
