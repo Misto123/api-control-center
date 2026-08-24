@@ -61,6 +61,7 @@ export async function POST() {
       // Try to parse credits from response
       let creditsUpdate: { totalCredits?: number; usedCredits?: number; creditsPercent?: number } = {};
       let isUp = res.ok || res.status < 500;
+      const isSerper = service.name.toLowerCase().includes('serper');
       
       try {
         const responseData = await res.json();
@@ -84,12 +85,13 @@ export async function POST() {
           creditsUpdate.totalCredits = responseData.balance;
           creditsUpdate.creditsPercent = 100; // We don't know the original total, assume what we have is 100%
         }
-        // Generic credit response formats
-        else if (responseData.credits !== undefined) {
+        // Generic credit response formats. Serper's search response can
+        // contain request-cost fields, not an account balance.
+        else if (!isSerper && responseData.credits !== undefined) {
           creditsUpdate.totalCredits = responseData.credits;
           creditsUpdate.creditsPercent = responseData.credits_percent || 100;
         }
-        else if (responseData.balance !== undefined) {
+        else if (!isSerper && responseData.balance !== undefined) {
           creditsUpdate.totalCredits = responseData.balance;
         }
       } catch (e) {
