@@ -65,14 +65,10 @@ export async function POST() {
       try {
         const responseData = await res.json();
         
-        // Firecrawl: Insufficient credits error means API is UP but credits are 0
+        // Firecrawl's 402 means the API is reachable, but it does not expose
+        // the account balance in this response. Preserve any manual balance.
         if (responseData.success === false && responseData.error?.includes('Insufficient credits')) {
           isUp = true;
-          creditsUpdate = {
-            totalCredits: 0,
-            usedCredits: 0,
-            creditsPercent: 0,
-          };
         }
         // the platform API format
         else if (responseData.balance_infos && Array.isArray(responseData.balance_infos)) {
@@ -117,14 +113,19 @@ export async function POST() {
         ...creditsUpdate,
       }).eq('id', service.id);
 
-      // Check for low balance (USD/EUR services)
-      if (creditsUpdate.totalCredits !== undefined) {
+      // Check any known balance. If this provider did not return balance data,
+      // retain and evaluate the last explicitly recorded value.
+      const balanceForAlert = creditsUpdate.totalCredits ?? service.totalCredits;
+      if (balanceForAlert !== undefined && balanceForAlert !== null) {
         const creditUnit = service.credit_unit || 'credits';
         const minimumBalance = service.minimum_balance ?? 5;
-        const currentBalance = creditsUpdate.totalCredits;
+        const currentBalance = balanceForAlert;
 
-        // For USD/EUR services, check against minimum_balance
-        if ((creditUnit === 'USD' || creditUnit === 'EUR') && currentBalance < minimumBalance) {
+        const isLow = (creditUnit === 'USD' || creditUnit === 'EUR')
+          ? currentBalance < minimumBalance
+          : (creditsUpdate.creditsPercent ?? service.creditsPercent ?? 100) < 20 || currentBalance <= 0;
+
+        if (isLow) {
           const { data: existingAlert } = await supabase
             .from('alerts')
             .select('id')
@@ -140,7 +141,7 @@ export async function POST() {
               type: 'LOW_CREDITS',
               severity: 'WARNING',
               title: `${service.name} - Low Balance`,
-              message: `Balance is ${creditUnit === 'USD' ? '$' : '€'}${currentBalance.toFixed(2)}, below minimum threshold of ${creditUnit === 'USD' ? '$' : '€'}${minimumBalance.toFixed(2)}`,
+              message: `${service.name} balance is ${currentBalance} ${creditUnit}, below the configured minimum.`,
               isActive: true,
               isRead: false,
             });

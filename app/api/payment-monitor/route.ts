@@ -135,8 +135,7 @@ async function createAlert(message: string, source: string) {
     id: generateId(),
     title: '💰 Payment Notification Detected',
     message: `${source}: ${message}`,
-    severity: 'HIGH',
-    source: 'Payment Monitor',
+    severity: 'WARNING',
     isRead: false,
   });
 }
