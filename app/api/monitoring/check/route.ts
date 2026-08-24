@@ -119,7 +119,11 @@ export async function POST() {
       if (balanceForAlert !== undefined && balanceForAlert !== null) {
         const creditUnit = service.credit_unit || 'credits';
         const minimumBalance = service.minimum_balance ?? 5;
-        const currentBalance = balanceForAlert;
+        const currentBalance = (creditUnit === 'USD' || creditUnit === 'EUR')
+          ? balanceForAlert
+          : (creditsUpdate.totalCredits === undefined && service.usedCredits !== null && service.usedCredits !== undefined
+            ? balanceForAlert - service.usedCredits
+            : balanceForAlert);
 
         const isLow = (creditUnit === 'USD' || creditUnit === 'EUR')
           ? currentBalance < minimumBalance
