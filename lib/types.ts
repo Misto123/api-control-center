@@ -43,6 +43,7 @@ export interface Service {
   monitoringEnabled: boolean;
   checkInterval: number;
   lastCheckedAt: string | null;
+  dashboard_visible: boolean;
   categoryId: string | null;
   createdAt: string;
   updatedAt: string;

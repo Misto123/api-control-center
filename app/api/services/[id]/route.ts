@@ -26,6 +26,11 @@ export async function PUT(
   // Convert empty strings to null for foreign keys
   if (body.categoryId === '') body.categoryId = null;
 
+  if (body.dashboardVisible !== undefined) {
+    body.dashboard_visible = Boolean(body.dashboardVisible);
+    delete body.dashboardVisible;
+  }
+
   // Auto-activate service if API key is set and status is NOT_CONFIGURED
   const { data: currentService } = await supabase
     .from('services')

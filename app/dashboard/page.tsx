@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import type { Service, Alert } from '@/lib/types';
 import { Navigation } from '@/components/Navigation';
 
@@ -11,6 +11,7 @@ export default function DashboardPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkingPayments, setCheckingPayments] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
 
   const handleCheckPayments = async () => {
     setCheckingPayments(true);
@@ -21,6 +22,16 @@ export default function DashboardPage() {
     } finally {
       setCheckingPayments(false);
     }
+  };
+
+  const setDashboardVisibility = async (service: Service, visible: boolean) => {
+    const response = await fetch(`/api/services/${service.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dashboardVisible: visible }),
+    });
+
+    if (response.ok) await fetchData();
   };
 
   const fetchData = useCallback(async () => {
@@ -96,6 +107,13 @@ export default function DashboardPage() {
   const downCount = services.filter(s => s.status === 'DOWN').length;
   const notConfiguredCount = services.filter(s => s.status === 'NOT_CONFIGURED').length;
 
+  // Filter services: hide NOT_CONFIGURED without API key unless showInactive is true
+  const filteredServices = showInactive
+    ? services
+    : services.filter(s => s.dashboard_visible !== false && !(s.status === 'NOT_CONFIGURED' && !s.apiKey));
+
+  const hiddenCount = services.length - filteredServices.length;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
@@ -135,11 +153,13 @@ export default function DashboardPage() {
             <span className="text-gray-600">Active:</span>
             <span className="font-semibold text-green-600">{activeCount}</span>
           </div>
+          <div className="w-px h-6 bg-gray-200" />
           <div className="flex items-center gap-2">
             <XCircle className="w-4 h-4 text-red-500" />
             <span className="text-gray-600">Down:</span>
             <span className="font-semibold text-red-600">{downCount}</span>
           </div>
+          <div className="w-px h-6 bg-gray-200" />
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-gray-400" />
             <span className="text-gray-600">Not Configured:</span>
@@ -155,16 +175,27 @@ export default function DashboardPage() {
               </div>
             </>
           )}
+          {hiddenCount > 0 && (
+            <>
+              <div className="w-px h-6 bg-gray-200" />
+              <button
+                onClick={() => setShowInactive(!showInactive)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-xs font-medium"
+              >
+                {showInactive ? 'Hide' : 'Show'} Inactive ({hiddenCount})
+              </button>
+            </>
+          )}
         </div>
 
         {/* Services Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-          {services.map((service) => (
-            <Link
+          {filteredServices.map((service) => (
+            <div
               key={service.id}
-              href={`/services?id=${service.id}`}
               className={`relative group border-2 rounded-xl p-4 transition-all ${getStatusColor(service.status)}`}
             >
+              <Link href={`/services?id=${service.id}`} className="block">
               {/* Status Icon */}
               <div className="absolute top-3 right-3">
                 {getStatusIcon(service.status)}
@@ -236,9 +267,34 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
-            </Link>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setDashboardVisibility(service, false)}
+                className="absolute bottom-2 right-2 z-20 rounded bg-white/90 p-1 text-gray-500 shadow-sm hover:text-red-600"
+                title="Hide from dashboard"
+                aria-label={`Hide ${service.name} from dashboard`}
+              >
+                <EyeOff className="h-4 w-4" />
+              </button>
+            </div>
           ))}
         </div>
+
+        {showInactive && services.some(s => s.dashboard_visible === false) && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {services.filter(s => s.dashboard_visible === false).map(service => (
+              <button
+                key={service.id}
+                type="button"
+                onClick={() => setDashboardVisibility(service, true)}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+              >
+                <Eye className="h-3.5 w-3.5" /> Show {service.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {services.length === 0 && (
           <div className="bg-white rounded-xl shadow-md p-12 text-center">

@@ -1,0 +1,2 @@
+ALTER TABLE services
+  ADD COLUMN IF NOT EXISTS dashboard_visible BOOLEAN NOT NULL DEFAULT true;
