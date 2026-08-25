@@ -79,6 +79,7 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
   };
 
   const balance = formatBalance(service);
+  const displayStatus = service.status_detail === 'logged_out' ? 'Logged out' : service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection';
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -88,7 +89,7 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
             <div className="flex items-center gap-3 mb-2">
               <h3 className="text-2xl font-semibold">{service.name}</h3>
               <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusStyle(service.status)}`}>
-                ● {service.status}
+                ● {displayStatus}
               </span>
             </div>
             {service.description && <p className="text-gray-600 text-sm">{service.description}</p>}
@@ -140,13 +141,13 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
             <div className="text-gray-600 text-sm mb-2">Last check</div>
             <div className="flex items-center gap-2 text-sm font-semibold">
               <Activity className="h-5 w-5 text-blue-500" />
-              {service.lastCheckedAt ? new Date(service.lastCheckedAt).toLocaleString() : 'Not checked yet'}
+              {service.lastCheckedAt ? new Date(service.lastCheckedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Not checked yet'}
             </div>
           </div>
         </div> : (
           <div className="flex items-center gap-2 border-t border-gray-100 pt-4 text-sm font-semibold">
             <Activity className={`h-5 w-5 ${service.status === 'ACTIVE' ? 'text-green-500' : service.status === 'DOWN' ? 'text-red-500' : 'text-yellow-500'}`} />
-            {service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}
+            {displayStatus}
           </div>
         )}
 

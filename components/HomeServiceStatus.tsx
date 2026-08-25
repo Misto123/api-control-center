@@ -37,10 +37,10 @@ export function HomeServiceStatus() {
               <span className="truncate font-medium">{service.name}</span>
             </div>
             <div className="shrink-0 text-right text-gray-500">
-              <div className={service.status === 'ACTIVE' ? 'font-medium text-green-600' : service.status === 'DOWN' ? 'font-medium text-red-600' : 'font-medium text-yellow-600'}>
-                {service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}
+              <div className={service.status_detail === 'logged_out' ? 'font-medium text-orange-600' : service.status === 'ACTIVE' ? 'font-medium text-green-600' : service.status === 'DOWN' ? 'font-medium text-red-600' : 'font-medium text-yellow-600'}>
+                {service.status_detail === 'logged_out' ? 'Logged out' : service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}
               </div>
-              <div className="text-xs">{service.lastCheckedAt ? new Date(service.lastCheckedAt).toLocaleString() : 'Not checked yet'}</div>
+              <div className="text-xs">{service.lastCheckedAt ? new Date(service.lastCheckedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Not checked yet'}</div>
             </div>
           </div>
         ))}

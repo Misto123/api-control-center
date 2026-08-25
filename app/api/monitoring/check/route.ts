@@ -72,13 +72,15 @@ export async function POST() {
       let isUp = res.ok || res.status < 500;
       const isSerper = service.name.toLowerCase().includes('serper');
       let providerError: string | null = null;
+      let statusDetail: string | null = null;
       
       try {
         const responseData = await res.json();
 
         if (service.name.toLowerCase().includes('wasender')) {
-          isUp = responseData.status === 'connected';
-          providerError = isUp ? null : `Wasender session status: ${responseData.status || 'unknown'}`;
+          statusDetail = responseData.status || 'unknown';
+          isUp = statusDetail === 'connected';
+          providerError = isUp ? null : `Wasender session status: ${statusDetail}`;
         }
         
         // Firecrawl's 402 means the API is reachable, but it does not expose
@@ -126,6 +128,7 @@ export async function POST() {
 
       await supabase.from('services').update({
         status: newStatus,
+        status_detail: statusDetail,
         lastCheckedAt: new Date().toISOString(),
         ...creditsUpdate,
       }).eq('id', service.id);

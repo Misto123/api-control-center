@@ -22,6 +22,7 @@ export interface Service {
   slug: string;
   description: string | null;
   status: ServiceStatus;
+  status_detail: string | null;
   apiUrl: string | null;
   apiKey: string | null;
   checkEndpoint: string | null;

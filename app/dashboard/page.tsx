@@ -111,6 +111,10 @@ export default function DashboardPage() {
     return `${formatCredits(amount, service.credit_unit)} ${service.credit_unit || 'credits'}`;
   };
 
+  const formatCheckDate = (value: string | null) => value
+    ? new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : 'Not checked yet';
+
   const unreadAlerts = alerts.filter(a => !a.isRead).length;
   const activeCount = services.filter(s => s.status === 'ACTIVE').length;
   const downCount = services.filter(s => s.status === 'DOWN').length;
@@ -214,10 +218,10 @@ export default function DashboardPage() {
               {formatBalance(service) !== null ? <div className="space-y-1">
                 <div className="text-xs uppercase tracking-wide text-gray-500">Balance</div>
                 <div className="text-lg font-bold text-gray-900">{formatBalance(service)}</div>
-                <div className="text-xs text-gray-500">Last check: {service.lastCheckedAt ? new Date(service.lastCheckedAt).toLocaleString() : 'Not checked yet'}</div>
+                <div className="text-xs text-gray-500">Last check: {formatCheckDate(service.lastCheckedAt)}</div>
               </div> : (
                 <div className={`flex items-center gap-2 pt-3 text-sm font-semibold ${service.status === 'ACTIVE' ? 'text-green-600' : service.status === 'DOWN' ? 'text-red-600' : 'text-yellow-600'}`}>
-                  {service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}
+                  {service.status_detail === 'logged_out' ? 'Logged out' : service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}
                 </div>
               )}
 
