@@ -68,6 +68,8 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
     return 'bg-green-500';
   };
 
+  const hasCreditData = service.totalCredits !== null || service.usedCredits !== null || service.creditsPercent !== null;
+
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
       <div className="p-6">
@@ -119,7 +121,7 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {hasCreditData ? <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Credits */}
           <div>
             <div className="text-gray-600 text-sm mb-2">Credits Remaining</div>
@@ -175,7 +177,12 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
               </div>
             </div>
           </div>
-        </div>
+        </div> : (
+          <div className="flex items-center gap-2 border-t border-gray-100 pt-4 text-sm font-semibold">
+            <Activity className={`h-5 w-5 ${service.status === 'ACTIVE' ? 'text-green-500' : service.status === 'DOWN' ? 'text-red-500' : 'text-yellow-500'}`} />
+            {service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}
+          </div>
+        )}
 
         {/* Subscription Info */}
         {service.subscription_plan && (

@@ -201,7 +201,7 @@ export default function DashboardPage() {
               </h3>
 
               {/* Credits */}
-              <div className="space-y-1">
+              {(service.totalCredits !== null || service.usedCredits !== null || service.creditsPercent !== null) ? <div className="space-y-1">
                 {service.creditsPercent !== null ? (
                   <>
                     <div className={`text-2xl font-bold ${getCreditColor(service)}`}>
@@ -220,10 +220,12 @@ export default function DashboardPage() {
                       />
                     </div>
                   </>
-                ) : (
-                  <div className="text-sm text-gray-400 italic">No credit data</div>
-                )}
-              </div>
+                ) : null}
+              </div> : (
+                <div className={`flex items-center gap-2 pt-3 text-sm font-semibold ${service.status === 'ACTIVE' ? 'text-green-600' : service.status === 'DOWN' ? 'text-red-600' : 'text-yellow-600'}`}>
+                  {service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}
+                </div>
+              )}
 
               {/* Hover Details */}
               <div className="absolute inset-0 bg-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border-2 border-blue-500 shadow-lg z-10 overflow-hidden">

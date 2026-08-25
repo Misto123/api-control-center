@@ -37,6 +37,11 @@ export async function POST() {
           headers['Authorization'] = `Bearer ${service.apiKey}`;
           body = JSON.stringify({ url: 'https://example.com' });
         }
+        // Runware expects an array payload and the key in the auth task.
+        else if (service.name.toLowerCase().includes('runware')) {
+          method = 'POST';
+          body = JSON.stringify([{ taskType: 'authentication', apiKey: service.apiKey }]);
+        }
         // Serper uses POST with X-API-KEY header
         else if (service.name.toLowerCase().includes('serper')) {
           method = 'POST';
