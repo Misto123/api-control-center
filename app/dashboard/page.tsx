@@ -48,9 +48,27 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 60000); // Refresh every minute
-    return () => clearInterval(interval);
+    const checkIfDue = async () => {
+      const response = await fetch('/api/services');
+      const currentServices: Service[] = response.ok ? await response.json() : [];
+      const latestCheck = currentServices.reduce<number | null>((latest, service) => {
+        const timestamp = service.lastCheckedAt ? new Date(service.lastCheckedAt).getTime() : null;
+        return timestamp !== null && (latest === null || timestamp > latest) ? timestamp : latest;
+      }, null);
+
+      if (latestCheck === null || Date.now() - latestCheck >= 12 * 60 * 60 * 1000) {
+        await fetch('/api/monitoring/check', { method: 'POST' });
+      }
+      await fetchData();
+    };
+
+    checkIfDue();
+    const refreshInterval = setInterval(fetchData, 60000); // Refresh display every minute
+    const dueInterval = setInterval(checkIfDue, 12 * 60 * 60 * 1000);
+    return () => {
+      clearInterval(refreshInterval);
+      clearInterval(dueInterval);
+    };
   }, [fetchData]);
 
   const getStatusIcon = (status: string) => {
@@ -126,6 +144,11 @@ export default function DashboardPage() {
     : services.filter(s => s.dashboard_visible !== false && !(s.status === 'NOT_CONFIGURED' && !s.apiKey));
 
   const hiddenCount = services.length - filteredServices.length;
+  const latestCheckedAt = services.reduce<string | null>((latest, service) => {
+    if (!service.lastCheckedAt) return latest;
+    if (!latest || new Date(service.lastCheckedAt) > new Date(latest)) return service.lastCheckedAt;
+    return latest;
+  }, null);
 
   if (loading) {
     return (
@@ -146,6 +169,10 @@ export default function DashboardPage() {
               Back to Home
             </Link>
             <h1 className="text-3xl font-bold">API Control Center</h1>
+          </div>
+          <div className="text-right text-sm text-gray-500">
+            <div className="font-medium text-gray-700">Last checked</div>
+            <div>{latestCheckedAt ? new Date(latestCheckedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Not checked yet'}</div>
           </div>
         </div>
 

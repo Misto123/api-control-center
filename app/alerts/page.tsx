@@ -13,7 +13,7 @@ export default function AlertsPage() {
   const fetchAlerts = useCallback(async () => {
     const res = await fetch('/api/alerts');
     const data = await res.json();
-    setAlerts(Array.isArray(data) ? data : []);
+    setAlerts(Array.isArray(data) ? data.filter((alert: Alert) => !alert.isDismissed) : []);
     setLoading(false);
   }, []);
 
