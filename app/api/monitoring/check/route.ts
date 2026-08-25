@@ -42,6 +42,10 @@ export async function POST() {
           method = 'POST';
           body = JSON.stringify([{ taskType: 'authentication', apiKey: service.apiKey }]);
         }
+        // Wasender's session key reports the actual WhatsApp connection state.
+        else if (service.name.toLowerCase().includes('wasender')) {
+          headers['Authorization'] = `Bearer ${service.apiKey}`;
+        }
         // Serper uses POST with X-API-KEY header
         else if (service.name.toLowerCase().includes('serper')) {
           method = 'POST';
@@ -62,7 +66,7 @@ export async function POST() {
       });
 
       const responseTime = Date.now() - startTime;
-      
+
       // Try to parse credits from response
       let creditsUpdate: { totalCredits?: number; usedCredits?: number; creditsPercent?: number } = {};
       let isUp = res.ok || res.status < 500;
@@ -70,6 +74,10 @@ export async function POST() {
       
       try {
         const responseData = await res.json();
+
+        if (service.name.toLowerCase().includes('wasender')) {
+          isUp = responseData.status === 'connected';
+        }
         
         // Firecrawl's 402 means the API is reachable, but it does not expose
         // the account balance in this response. Preserve any manual balance.

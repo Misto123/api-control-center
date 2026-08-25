@@ -193,11 +193,11 @@ export default function DashboardPage() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
           {filteredServices.map((service) => (
             <div
               key={service.id}
-              className={`relative group min-h-20 border-2 rounded-xl p-3 transition-all ${getStatusColor(service.status)}`}
+              className={`relative group h-[92px] border-2 rounded-xl p-3 transition-all ${getStatusColor(service.status)}`}
             >
               <Link href={`/services?id=${service.id}`} className="block">
               {/* Status Icon */}
@@ -221,42 +221,6 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {/* Hover Details */}
-              <div className="absolute inset-0 bg-white rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border-2 border-blue-500 shadow-lg z-10 overflow-hidden">
-                <h3 className="font-bold mb-1 text-xs truncate">{service.name}</h3>
-                {service.description && (
-                  <p className="text-[10px] text-gray-600 mb-2 line-clamp-2">{service.description}</p>
-                )}
-                <div className="space-y-0.5 text-[10px]">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Status:</span>
-                    <span className="font-medium">{service.status}</span>
-                  </div>
-                  {service.totalCredits !== null && (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Total:</span>
-                        <span className="font-medium truncate">{formatCredits(service.totalCredits, service.credit_unit)} {service.credit_unit}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Used:</span>
-                        <span className="font-medium truncate">{formatCredits(service.usedCredits, service.credit_unit)} {service.credit_unit}</span>
-                      </div>
-                    </>
-                  )}
-                  {service.lastCheckedAt && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Last Check:</span>
-                      <span className="font-medium">{new Date(service.lastCheckedAt).toLocaleTimeString()}</span>
-                    </div>
-                  )}
-                  {service.apiUrl && (
-                    <div className="mt-1 pt-1 border-t">
-                      <span className="text-gray-500 break-all line-clamp-2">{service.apiUrl}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
               </Link>
               <button
                 type="button"
