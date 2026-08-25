@@ -101,6 +101,16 @@ export default function DashboardPage() {
     return amount.toFixed(unitStr === 'USD' || unitStr === 'EUR' ? 2 : 0);
   };
 
+  const formatBalance = (service: Service) => {
+    if (service.totalCredits === null && service.usedCredits === null) return null;
+    const amount = service.credit_unit === 'USD' || service.credit_unit === 'EUR'
+      ? service.totalCredits ?? 0
+      : service.totalCredits !== null && service.usedCredits !== null
+        ? service.totalCredits - service.usedCredits
+        : service.totalCredits ?? service.usedCredits ?? 0;
+    return `${formatCredits(amount, service.credit_unit)} ${service.credit_unit || 'credits'}`;
+  };
+
   const unreadAlerts = alerts.filter(a => !a.isRead).length;
   const activeCount = services.filter(s => s.status === 'ACTIVE').length;
   const downCount = services.filter(s => s.status === 'DOWN').length;
@@ -201,26 +211,10 @@ export default function DashboardPage() {
               </h3>
 
               {/* Credits */}
-              {(service.totalCredits !== null || service.usedCredits !== null || service.creditsPercent !== null) ? <div className="space-y-1">
-                {service.creditsPercent !== null ? (
-                  <>
-                    <div className={`text-2xl font-bold ${getCreditColor(service)}`}>
-                      {service.creditsPercent}%
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      {formatCredits(service.totalCredits, service.credit_unit)} {service.credit_unit || 'credits'}
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${
-                          service.creditsPercent < 10 ? 'bg-red-500' :
-                          service.creditsPercent < 20 ? 'bg-orange-500' : 'bg-green-500'
-                        }`}
-                        style={{ width: `${service.creditsPercent}%` }}
-                      />
-                    </div>
-                  </>
-                ) : null}
+              {formatBalance(service) !== null ? <div className="space-y-1">
+                <div className="text-xs uppercase tracking-wide text-gray-500">Balance</div>
+                <div className="text-lg font-bold text-gray-900">{formatBalance(service)}</div>
+                <div className="text-xs text-gray-500">Last check: {service.lastCheckedAt ? new Date(service.lastCheckedAt).toLocaleString() : 'Not checked yet'}</div>
               </div> : (
                 <div className={`flex items-center gap-2 pt-3 text-sm font-semibold ${service.status === 'ACTIVE' ? 'text-green-600' : service.status === 'DOWN' ? 'text-red-600' : 'text-yellow-600'}`}>
                   {service.status === 'ACTIVE' ? 'Online' : service.status === 'DOWN' ? 'Offline' : 'Pending connection'}

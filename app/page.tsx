@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Activity, Bell, FolderKanban, LayoutDashboard, Settings, Database } from 'lucide-react';
+import { HomeServiceStatus } from '@/components/HomeServiceStatus';
 
 export default function Home() {
   return (
@@ -14,6 +15,8 @@ export default function Home() {
             Monitor, manage, and optimize your API services with real-time alerts and insights
           </p>
         </div>
+
+        <HomeServiceStatus />
 
         {/* Main Navigation Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">

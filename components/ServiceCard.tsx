@@ -19,6 +19,16 @@ function formatCredits(amount: number, unit: string | null): string {
   return `${amount.toFixed(unitStr === 'USD' || unitStr === 'EUR' ? 2 : 0)} ${unitStr}`;
 }
 
+function formatBalance(service: Service): string | null {
+  if (service.totalCredits === null && service.usedCredits === null) return null;
+  const amount = service.credit_unit === 'USD' || service.credit_unit === 'EUR'
+    ? service.totalCredits ?? 0
+    : service.totalCredits !== null && service.usedCredits !== null
+      ? service.totalCredits - service.usedCredits
+      : service.totalCredits ?? service.usedCredits ?? 0;
+  return formatCredits(amount, service.credit_unit);
+}
+
 export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -68,7 +78,7 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
     return 'bg-green-500';
   };
 
-  const hasCreditData = service.totalCredits !== null || service.usedCredits !== null || service.creditsPercent !== null;
+  const balance = formatBalance(service);
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -121,60 +131,16 @@ export function ServiceCard({ service, onEdit, onDelete }: ServiceCardProps) {
           )}
         </div>
 
-        {hasCreditData ? <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Credits */}
+        {balance !== null ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <div className="text-gray-600 text-sm mb-2">Credits Remaining</div>
-            <div className="mb-2">
-              <div className="flex items-baseline gap-2">
-                <span className={`text-2xl font-bold ${getCreditColor(service.creditsPercent)}`}>
-                  {service.creditsPercent !== null ? `${service.creditsPercent}%` : 'N/A'}
-                </span>
-                {service.totalCredits !== null && (
-                  <span className="text-gray-500 text-sm">
-                    {formatCredits(service.totalCredits, service.credit_unit)}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div
-                className={`h-full ${getCreditBarColor(service.creditsPercent)} transition-all`}
-                style={{ width: `${service.creditsPercent ?? 0}%` }}
-              />
-            </div>
+            <div className="text-gray-600 text-sm mb-2">Balance</div>
+            <div className="text-2xl font-bold text-gray-900">{balance} <span className="text-sm font-normal text-gray-500">{service.credit_unit || 'credits'}</span></div>
           </div>
-
-          {/* Monitoring */}
           <div>
-            <div className="text-gray-600 text-sm mb-2">Monitoring</div>
-            <div className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-500" />
-              <span className="text-lg font-semibold">
-                {service.monitoringEnabled ? `Every ${service.checkInterval}s` : 'Disabled'}
-              </span>
-            </div>
-            {service.apiUrl && (
-              <p className="text-xs text-gray-500 mt-1 truncate font-mono">{service.apiUrl}</p>
-            )}
-          </div>
-
-          {/* Alert Thresholds */}
-          <div>
-            <div className="text-gray-600 text-sm mb-2">Alert Thresholds</div>
-            <div className="space-y-1 text-sm">
-              <div className="flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-yellow-500" />
-                <span>Low: {service.lowCreditsThreshold}% / Critical: {service.criticalCreditsThreshold}%</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                <span>Depletion: {service.depletionWarningDays}d / {service.depletionCriticalDays}d</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-orange-500" />
-                <span>Slow: {service.slowResponseThreshold}ms</span>
-              </div>
+            <div className="text-gray-600 text-sm mb-2">Last check</div>
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Activity className="h-5 w-5 text-blue-500" />
+              {service.lastCheckedAt ? new Date(service.lastCheckedAt).toLocaleString() : 'Not checked yet'}
             </div>
           </div>
         </div> : (
