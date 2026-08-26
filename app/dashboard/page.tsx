@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, XCircle, Clock, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, AlertTriangle, Eye, EyeOff, Play } from 'lucide-react';
 import type { Service, Alert } from '@/lib/types';
 
 export default function DashboardPage() {
@@ -29,6 +29,19 @@ export default function DashboardPage() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ dashboardVisible: visible }),
+    });
+
+    if (response.ok) await fetchData();
+  };
+
+  const activateMonitoring = async (service: Service) => {
+    const response = await fetch(`/api/services/${service.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        monitoringEnabled: true,
+        ...(service.apiKey ? { status: 'ACTIVE' } : {}),
+      }),
     });
 
     if (response.ok) await fetchData();
@@ -145,6 +158,7 @@ export default function DashboardPage() {
     : services.filter(s => s.dashboard_visible !== false && !(s.status === 'NOT_CONFIGURED' && !s.apiKey));
 
   const hiddenCount = services.length - filteredServices.length;
+  const inactiveCount = services.filter(s => s.status === 'NOT_CONFIGURED' || !s.monitoringEnabled).length;
   const latestCheckedAt = services.reduce<string | null>((latest, service) => {
     if (!service.lastCheckedAt) return latest;
     if (!latest || new Date(service.lastCheckedAt) > new Date(latest)) return service.lastCheckedAt;
@@ -211,14 +225,14 @@ export default function DashboardPage() {
               </div>
             </>
           )}
-          {hiddenCount > 0 && (
+          {inactiveCount > 0 && (
             <>
               <div className="w-px h-6 bg-gray-200" />
               <button
                 onClick={() => setShowInactive(!showInactive)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors text-xs font-medium"
               >
-                {showInactive ? 'Hide' : 'Show'} Inactive ({hiddenCount})
+                {showInactive ? 'Hide' : 'Show'} Inactive ({inactiveCount})
               </button>
             </>
           )}
@@ -272,6 +286,16 @@ export default function DashboardPage() {
               >
                 <EyeOff className="h-4 w-4" />
               </button>
+              {showInactive && (service.status === 'NOT_CONFIGURED' || !service.monitoringEnabled) && (
+                <button
+                  type="button"
+                  onClick={() => activateMonitoring(service)}
+                  className="absolute bottom-2 left-2 z-20 inline-flex items-center gap-1 rounded bg-white/90 px-2 py-1 text-[10px] font-medium text-blue-700 shadow-sm hover:bg-white"
+                  title={service.apiKey ? 'Activate monitoring' : 'Enable monitoring after adding a key'}
+                >
+                  <Play className="h-3 w-3" /> Activate
+                </button>
+              )}
             </div>
           ))}
         </div>
