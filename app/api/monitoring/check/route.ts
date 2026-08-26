@@ -129,6 +129,8 @@ export async function POST() {
       await supabase.from('services').update({
         status: newStatus,
         status_detail: statusDetail,
+        last_error: isUp ? null : providerError || `HTTP ${res.status}`,
+        last_status_code: res.status,
         lastCheckedAt: new Date().toISOString(),
         ...creditsUpdate,
       }).eq('id', service.id);
@@ -244,6 +246,8 @@ export async function POST() {
 
       await supabase.from('services').update({
         status: 'DOWN',
+        last_error: errorMsg,
+        last_status_code: null,
         lastCheckedAt: new Date().toISOString(),
       }).eq('id', service.id);
 

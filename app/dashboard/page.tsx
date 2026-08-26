@@ -11,6 +11,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [checkingPayments, setCheckingPayments] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
+  const [selectedOfflineService, setSelectedOfflineService] = useState<Service | null>(null);
 
   const handleCheckPayments = async () => {
     setCheckingPayments(true);
@@ -230,7 +231,16 @@ export default function DashboardPage() {
               key={service.id}
               className={`relative group h-[92px] border-2 rounded-xl p-3 transition-all ${getStatusColor(service.status)}`}
             >
-              <Link href={`/services?id=${service.id}`} className="block">
+              <Link
+                href={`/services?id=${service.id}`}
+                className="block"
+                onClick={(event) => {
+                  if (service.status === 'DOWN') {
+                    event.preventDefault();
+                    setSelectedOfflineService(service);
+                  }
+                }}
+              >
               {/* Status Icon */}
               <div className="absolute top-3 right-3">
                 {getStatusIcon(service.status)}
@@ -289,6 +299,26 @@ export default function DashboardPage() {
             <Link href="/services" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
               Go to Services
             </Link>
+          </div>
+        )}
+
+        {selectedOfflineService && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Service issue details">
+            <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl">
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-red-600">Offline service</p>
+                  <h2 className="text-xl font-bold text-gray-900">{selectedOfflineService.name}</h2>
+                </div>
+                <button onClick={() => setSelectedOfflineService(null)} className="rounded-lg px-3 py-1 text-gray-500 hover:bg-gray-100">Close</button>
+              </div>
+              <dl className="space-y-3 text-sm">
+                <div><dt className="text-gray-500">Issue</dt><dd className="font-medium text-red-700">{selectedOfflineService.last_error || 'The health check failed.'}</dd></div>
+                <div><dt className="text-gray-500">HTTP status</dt><dd className="font-medium">{selectedOfflineService.last_status_code ?? 'No response'}</dd></div>
+                <div><dt className="text-gray-500">Endpoint</dt><dd className="break-all font-mono text-xs">{selectedOfflineService.apiUrl}{selectedOfflineService.checkEndpoint || ''}</dd></div>
+                <div><dt className="text-gray-500">Last checked</dt><dd className="font-medium">{formatCheckDate(selectedOfflineService.lastCheckedAt)}</dd></div>
+              </dl>
+            </div>
           </div>
         )}
       </div>

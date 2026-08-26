@@ -23,6 +23,8 @@ export interface Service {
   description: string | null;
   status: ServiceStatus;
   status_detail: string | null;
+  last_error: string | null;
+  last_status_code: number | null;
   apiUrl: string | null;
   apiKey: string | null;
   checkEndpoint: string | null;

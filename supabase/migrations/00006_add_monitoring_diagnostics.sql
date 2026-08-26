@@ -1,0 +1,3 @@
+ALTER TABLE services
+  ADD COLUMN IF NOT EXISTS last_error TEXT,
+  ADD COLUMN IF NOT EXISTS last_status_code INTEGER;
