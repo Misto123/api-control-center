@@ -36,6 +36,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 2. Stealth Browser MCP (if installed and available)
 3. Playwright/other tools (fallback only)
 
+# Testing & QA
+
+## ALWAYS Perform QA After Major Updates
+- **Trigger:** After any significant feature addition, bug fix, or deployment
+- **Method:** Use Kimi WebBridge to automate browser testing on production
+- **What to test:** Core user flows, new features, critical paths
+- **Production URL:** https://api-control-center.vercel.app
+- **Never skip:** QA is not optional after deploys
+
 # Code Quality & Efficiency
 
 ## ALWAYS Use Ponytail for Minimal Code
