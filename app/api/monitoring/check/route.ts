@@ -52,10 +52,18 @@ export async function POST() {
           headers['X-API-KEY'] = service.apiKey;
           body = JSON.stringify({ q: 'health check', num: 1 });
         }
+        // AdsPower Local API uses Bearer token
+        else if (service.name.toLowerCase().includes('adspower')) {
+          headers['Authorization'] = `Bearer ${service.apiKey}`;
+        }
         // Default: Bearer token
         else {
           headers['Authorization'] = `Bearer ${service.apiKey}`;
         }
+      }
+      // AdsPower without API key (just check if service is reachable)
+      else if (service.name.toLowerCase().includes('adspower')) {
+        // No auth needed for status check
       }
 
       const res = await fetch(url, {

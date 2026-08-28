@@ -278,7 +278,7 @@ export default function DashboardPage() {
               </Link>
               <button
                 type="button"
-                onClick={() => setDashboardVisibility(service, false)}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDashboardVisibility(service, false); }}
                 className="absolute bottom-2 right-2 z-20 rounded bg-white/90 p-1 text-gray-500 shadow-sm hover:text-red-600"
                 title="Hide from dashboard"
                 aria-label={`Hide ${service.name} from dashboard`}
@@ -288,7 +288,7 @@ export default function DashboardPage() {
               {showInactive && (service.status === 'NOT_CONFIGURED' || !service.monitoringEnabled) && (
                 <button
                   type="button"
-                  onClick={() => activateMonitoring(service)}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); activateMonitoring(service); }}
                   className="absolute bottom-2 left-2 z-20 inline-flex items-center gap-1 rounded bg-white/90 px-2 py-1 text-[10px] font-medium text-blue-700 shadow-sm hover:bg-white"
                   title={service.apiKey ? 'Activate monitoring' : 'Enable monitoring after adding a key'}
                 >
