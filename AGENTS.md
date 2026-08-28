@@ -35,3 +35,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 1. **Kimi WebBridge** (primary - real browser with user sessions)
 2. Stealth Browser MCP (if installed and available)
 3. Playwright/other tools (fallback only)
+
+# Code Quality & Efficiency
+
+## ALWAYS Use Ponytail for Minimal Code
+- **Install:** Add `"plugin": ["@dietrichgebert/ponytail"]` to `opencode.json`
+- **Purpose:** Write only necessary code, reuse existing solutions, prefer stdlib/platform features
+- **Benefits:** ~54% less code, ~20% cheaper, ~27% faster, 100% safe
+- **Default mode:** `full` (use `/ponytail ultra` for aggressive minimalism)
+- **Commands:** `/ponytail-review` (review current diff), `/ponytail-audit` (audit whole repo)
+- **Principles:** YAGNI → reuse → stdlib → platform → dependency → one-liner → minimal working code
+- **Never compromises:** validation, error handling, security, accessibility
+- **Repository:** https://github.com/DietrichGebert/ponytail
