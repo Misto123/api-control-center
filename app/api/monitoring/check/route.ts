@@ -115,6 +115,30 @@ export async function POST() {
         // Response not JSON or no credits info - that's fine
       }
 
+      // Firecrawl: fetch credits from dedicated endpoint
+      if (service.name.toLowerCase().includes('firecrawl') && service.apiKey && isUp) {
+        try {
+          const creditRes = await fetch('https://api.firecrawl.dev/v2/team/credit-usage', {
+            headers: { 'Authorization': `Bearer ${service.apiKey}` },
+            signal: AbortSignal.timeout(5000),
+          });
+          if (creditRes.ok) {
+            const creditData = await creditRes.json();
+            if (creditData.success && creditData.data) {
+              const remaining = creditData.data.remainingCredits ?? null;
+              const plan = creditData.data.planCredits ?? null;
+              if (remaining !== null && plan !== null) {
+                creditsUpdate.totalCredits = plan;
+                creditsUpdate.usedCredits = plan - remaining;
+                creditsUpdate.creditsPercent = plan > 0 ? Math.round((remaining / plan) * 100) : 0;
+              }
+            }
+          }
+        } catch (e) {
+          // Credit fetch failed, keep existing data
+        }
+      }
+
       results.push({
         serviceId: service.id,
         name: service.name,
