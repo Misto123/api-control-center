@@ -21,3 +21,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Check for model updates only when explicitly requested
 - Prioritize cost-efficiency over cutting-edge capabilities
 - Document any model changes in git commit messages
+
+# Browser Automation Preferences
+
+## ALWAYS Use Kimi WebBridge for Web Browsing
+- **Default tool for ALL web browsing and browser automation: Kimi WebBridge**
+- Use the user's real browser with actual login sessions
+- Kimi WebBridge handles: navigation, clicking, typing, reading, screenshots, web scraping
+- Only use alternative tools (Playwright, etc.) if explicitly requested or if Kimi WebBridge fails
+- Triggers: "browse", "open website", "click on page", "screenshot", "scrape", any web interaction
+
+## Browser Tool Priority
+1. **Kimi WebBridge** (primary - real browser with user sessions)
+2. Stealth Browser MCP (if installed and available)
+3. Playwright/other tools (fallback only)
