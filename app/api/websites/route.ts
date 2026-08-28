@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const body = await request.json();
 
-  const { data, error } = await supabase
+  const { data: website, error } = await supabase
     .from('websites')
     .insert({
       id: generateId(),
@@ -42,5 +42,23 @@ export async function POST(request: Request) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 201 });
+
+  // Auto-create rank tracker for each target keyword
+  if (website && body.target_keywords && Array.isArray(body.target_keywords)) {
+    const domain = new URL(website.url).hostname.replace(/^www\./, '');
+    
+    for (const keyword of body.target_keywords) {
+      if (keyword && keyword.trim()) {
+        await supabase.from('rank_trackers').insert({
+          id: `rkt${Date.now()}${Math.random().toString(36).substring(2, 10)}`,
+          domain,
+          keyword: keyword.trim(),
+          country: 'us',
+          language: 'en',
+        });
+      }
+    }
+  }
+
+  return NextResponse.json(website, { status: 201 });
 }

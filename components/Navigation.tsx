@@ -45,7 +45,6 @@ export function Navigation({ unreadAlerts = 0, onCheckPayments, checkingPayments
         {liveUnreadAlerts > 0 && <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs text-white">{liveUnreadAlerts}</span>}
       </Link>
       <Link href="/projects" className="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"><FolderKanban className="w-4 h-4" /> Projects</Link>
-      <Link href="/categories" className="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"><Database className="w-4 h-4" /> Categories</Link>
       <Link href="/settings" className="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"><Settings className="w-4 h-4" /> Settings</Link>
       {onCheckPayments && (
         <button
